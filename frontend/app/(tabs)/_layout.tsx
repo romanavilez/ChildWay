@@ -26,7 +26,7 @@ export default function TabLayout() {
     const TabBarIcon = ({focused, icon, activeIcon}: tabBarIconProps) => (
         <View className='flex justify-center items-center mt-8 h-10'>
             {focused ? (
-                <Image source={activeIcon} resizeMode='contain' style={{height: 50, width: 50}}/>
+                <Image source={activeIcon} resizeMode='contain' style={{height: 50, width: 50}} />
             ) : (
                 <Image source={icon} resizeMode='contain' style={{height: 50, width: 50}} />
             )}
@@ -39,9 +39,11 @@ export default function TabLayout() {
                 headerShown: false,
                 tabBarShowLabel: false,
                 tabBarStyle: {
-                    height: 100,
-                    
-                }
+                    height:70,
+                    borderRadius: 30,
+                    borderTopWidth: 0,
+                    marginBottom: 40
+                },
             }}
         >
             <Tabs.Screen 

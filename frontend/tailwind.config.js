@@ -5,7 +5,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "tab-title": '#57C785'
+        "tab-title": '#57C785',
+        "primary": '#10E5B2',
+        "secondary": '#0B0C15',
+        "dark_grey": '#12151D',
       },
       fontFamily: {
         "bungee": ["Bungee-Regular", "sans-serif"],

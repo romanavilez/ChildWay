@@ -40,9 +40,9 @@ export default function TabLayout() {
                 tabBarShowLabel: false,
                 tabBarStyle: {
                     height:70,
-                    borderRadius: 30,
                     borderTopWidth: 0,
-                    marginBottom: 40
+                    marginBottom: 40,
+                    backgroundColor: '#12151D'
                 },
             }}
         >

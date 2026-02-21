@@ -6,8 +6,8 @@ const profile = () => {
     return (
         <SafeAreaView edges={['top']} className='flex-1 bg-secondary'> 
             <View className='flex flex-1 px-2 items-center'>
-                <Text className='font-bungee text-3xl color-white pt-2'>Profile</Text>
-                <View className='w-full flex-1 rounded-2xl bg-gray-200 mb-2'>   
+                <Text className='font-bungee text-3xl color-white pt-3'>Profile</Text>
+                <View className='w-full flex-1 rounded-2xl bg-gray-200 mb-2'> 
                 </View>
             </View>
         </SafeAreaView>

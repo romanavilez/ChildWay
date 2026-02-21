@@ -6,7 +6,7 @@ const parents = () => {
     return (
         <SafeAreaView edges={['top']} className='flex-1 bg-secondary'> 
             <View className='flex flex-1 px-2 items-center'>
-                <Text className='font-bungee text-3xl color-white pt-2'>Parents</Text>
+                <Text className='font-bungee text-3xl color-white pt-3'>Parents</Text>
                 <View className='w-full flex-1 rounded-2xl bg-gray-200 mb-2'>   
                 </View>
             </View>

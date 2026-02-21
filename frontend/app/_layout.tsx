@@ -19,6 +19,8 @@ export default function RootLayout() {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded, error]);
 
+  if (!fontsLoaded) return null;
+
   return (
     <SafeAreaProvider>
       {/* <StatusBar /> */}

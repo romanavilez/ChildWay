@@ -7,12 +7,17 @@ module.exports = {
       colors: {
         "tab-title": '#57C785',
         "primary": '#10E5B2',
-        "secondary": '#0B0C15'
+        "secondary": '#0B0C15',
+        "tertiary": '#FF6F52'
       },
       fontFamily: {
         "bungee": ["Bungee-Regular", "sans-serif"],
-        "calsans": ["Calsans-Regular", "sans-serif"],
-        "staatliches": ["Staatliches-Regular", "sans-serif"]
+        "calsans": ["CalSans-Regular", "sans-serif"],
+        "staatliches": ["Staatliches-Regular", "sans-serif"],
+        "oswald-extralight": ["Oswald-ExtraLight", "sans-serif"],
+        "oswald-light": ["Oswald-Light", "sans-serif"],
+        "oswald-medium": ["Oswald-Medium", "sans-serif"],
+        "oswald-regular": ["Oswald-Regular", "sans-serif"]
       }
     },
   },

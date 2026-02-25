@@ -11,7 +11,11 @@ export default function RootLayout() {
   const [fontsLoaded, error] = useFonts({
     "Bungee-Regular": require("../assets/fonts/Bungee-Regular.ttf"),
     "CalSans-Regular": require("../assets/fonts/CalSans-Regular.ttf"),
-    "Staatliches-Regular": require("../assets/fonts/Staatliches-Regular.ttf")
+    "Staatliches-Regular": require("../assets/fonts/Staatliches-Regular.ttf"),
+    "Oswald-ExtraLight": require("../assets/fonts/Oswald-ExtraLight.ttf"),
+    "Oswald-Light": require("../assets/fonts/Oswald-Light.ttf"),
+    "Oswald-Medium": require("../assets/fonts/Oswald-Medium.ttf"),
+    "Oswald-Regular": require("../assets/fonts/Oswald-Regular.ttf")
   })
 
   useEffect(() => {

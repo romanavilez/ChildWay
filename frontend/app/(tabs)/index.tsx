@@ -1,10 +1,12 @@
 import { View, Text, TextInput, TouchableOpacity, Image, Alert, FlatList, Linking } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import Mapbox, {Camera, LocationPuck, MapView} from '@rnmapbox/maps'
+import Mapbox, {Camera, LineLayer, LocationPuck, MapView, ShapeSource, MarkerView, Images} from '@rnmapbox/maps'
 import {requestForegroundPermissionsAsync, getCurrentPositionAsync, LocationObjectCoords} from 'expo-location'
+import {LinearGradient} from 'expo-linear-gradient'
 import { v4 as uuidv4} from 'uuid'
 import 'react-native-get-random-values'
+import {Feature, LineString} from "geojson"
 
 import RadioButton from '@/components/RadioButton'
 
@@ -20,6 +22,8 @@ type suggestPlacesProps = {
 }
 
 type mapboxSuggestion = {
+    mapboxId: string
+    sessionToken: string
     name: string
     eta: number
     address: string
@@ -31,6 +35,8 @@ const Index = () => {
     const [search, setSearch] = useState('');
     const [suggestions, setSuggestions] = useState<mapboxSuggestion[]>([]);
     const [destination, setDestination] = useState("");
+    const [destCoordinates, setDestCoordinates] = useState<LocationObjectCoords | null>(null);
+    const [route, setRoute] = useState<any>(null);
 
     // Ask user for location permission
     useEffect(() => {
@@ -42,12 +48,10 @@ const Index = () => {
         })();
     }, []);
 
-    // Render suggestions only when useState is updated
     useEffect(() => {
-        for (let suggestion of suggestions) {
-            console.log(suggestion);
-        }
-    }, [suggestions])
+        if(!destCoordinates) return;
+        getRoute();
+    }, [destCoordinates]);
     
     // Set travel mode only if it is different than the current
     const handleModeSelection = (value: string) =>{
@@ -58,16 +62,35 @@ const Index = () => {
         }
     }
 
-    const handleDestinationSelection = (address: string) => {
+    // Update relevant fields when destination is selected from suggestions
+    const handleDestinationSelection = (address: string, mapboxId: string, sessionToken: string) => {
         setDestination(address);
         setSuggestions([]);
         setSearch(address);
+        retrievePlace(mapboxId, sessionToken);
     }
     
     // Get user's coordinates
     const getLocation = async () => {
         let loc = await getCurrentPositionAsync({});
         setLocation(loc.coords);
+    }
+
+    // get an array of coordinates using Directions API, from user's location to destination
+    const getRoute = async () => {
+        const accessToken = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN;
+        const url = `https://api.mapbox.com/directions/v5/mapbox/${travelMode}/` +
+                    `${location?.longitude},${location?.latitude};${destCoordinates?.longitude},${destCoordinates?.latitude}/?` +
+                    `access_token=${accessToken}` +
+                    `&geometries=geojson`;
+        
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            setRoute(data.routes[0].geometry);
+        } catch (error) {
+            console.log("Error getting directions: ", error);
+        }
     }
 
     // Return 5 of the closest locations to user, matching the query
@@ -93,13 +116,34 @@ const Index = () => {
             let suggestions: mapboxSuggestion[] = []
             for (let suggestion of data.suggestions) {
                 if (suggestion.name && suggestion.eta && suggestion.full_address) {
-                    suggestions.push({name: suggestion.name, eta: suggestion.eta, address: suggestion.full_address});
+                    suggestions.push({mapboxId: suggestion.mapbox_id, 
+                                    sessionToken, 
+                                    name: suggestion.name, 
+                                    eta: suggestion.eta, 
+                                    address: suggestion.full_address}
+                    );
                 }
             }
             suggestions.sort((a, b) => a.eta - b.eta);
             setSuggestions(suggestions);
         } catch (error) {
             console.log("Error suggesting places: ", error);
+        }
+    }
+
+    // retrieve coordinates of place selected from suggestions
+    const retrievePlace = async (mapboxId: string, sessionToken: string) => {
+        const accessToken = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN;
+        const url = `https://api.mapbox.com/search/searchbox/v1/retrieve/${mapboxId}?` +
+                    `session_token=${sessionToken}` +
+                    `&access_token=${accessToken}`;
+        
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            setDestCoordinates(data.features[0].properties.coordinates);
+        } catch (error) {
+            console.log("Error retrieving place: ", error);
         }
     }
 
@@ -123,7 +167,12 @@ const Index = () => {
             <View className='flex flex-1 px-2 items-center'>
                 <Text className='font-bungee text-3xl text-white pt-3 w-full text-center'>Map</Text>
                 <View className='w-full relative'>
-                    <View className={`rounded-2xl bg-primary ${destination ? 'h-20' : 'h-14'} w-full flex justify-center pl-2 pr-8`}>
+                    <LinearGradient 
+                        className={`rounded-2xl ${destination ? 'h-20' : 'h-14'} w-full flex justify-center pl-2 pr-8 overflow-hidden`}
+                        colors={['#10E5B2', '#72f38e']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                    >
                         <TextInput 
                             className={`color-white ${destination ? 'h-28' : 'h-14'} w-full font-staatliches text-xl`} 
                             placeholder='Where are you heading?'
@@ -147,17 +196,19 @@ const Index = () => {
                                 setSearch('');
                                 setSuggestions([]);
                                 setDestination("");
+                                setRoute(null);
+                                setDestCoordinates(null);
                             }}
                         >
                             <Image source={require('@/assets/icons/cross.png')} resizeMode='contain' className='h-5 w-5'/>
                         </TouchableOpacity>
-                    </View>
+                    </LinearGradient>
                     {suggestions.length > 0 && (
                         <View className='w-full absolute z-10 top-14 rounded-lg bg-slate-800'>
                             <FlatList
                                 data={suggestions}
                                 renderItem={({item}) => (
-                                    <TouchableOpacity className='h-15 pl-2' onPress={() => handleDestinationSelection(item.address)}>
+                                    <TouchableOpacity className='h-15 pl-2' onPress={() => handleDestinationSelection(item.address, item.mapboxId, item.sessionToken)}>
                                         <View className='absolute left-1 top-2 bottom-1 bg-primary w-[2]'/>
                                         <View className='flex-row justify-between'>
                                             <View className='flex-1'>
@@ -172,36 +223,72 @@ const Index = () => {
                         </View>
                     )}
                 </View>
-                <View className='radio-buttons flex-row justify-between w-full'>
+                <View className='radio-buttons flex-row justify-between w-full gap-1'>
                     <RadioButton 
                         value='walking' 
                         label='walking'
                         travelMode={travelMode}
                         onValueChange={handleModeSelection}
+                        color='#10E5B2'
                     />
                     <RadioButton 
                         value='cycling'
                         label='cycling'
                         travelMode={travelMode}
                         onValueChange={handleModeSelection}
+                        color='#4fed9f'
                     />
                     <RadioButton 
                         value='driving'
                         label='driving'
                         travelMode={travelMode}
                         onValueChange={handleModeSelection}
+                        color='#72f38e'
                     />
                 </View>
                 <View className='w-full flex-1 rounded-2xl mb-2 overflow-hidden'> 
                     <MapView style={{flex: 1}}>
                         <Camera followUserLocation followZoomLevel={13}/>
-                        <LocationPuck puckBearingEnabled puckBearing='heading' pulsing={{ isEnabled: true }}/>
+                        <LocationPuck puckBearingEnabled puckBearing='heading' pulsing={{ isEnabled: true, color: "#10E5B2" }} bearingImage='origin'/>
+                        <Images
+                            images={{
+                                origin: require('@/assets/icons/origin.png'),
+                            }}
+                        />
+                        {route && (
+                            <ShapeSource id="routeSource" shape={{type: "Feature", geometry: route, properties: {}}} lineMetrics={true}>
+                                <LineLayer 
+                                    id="lineSource" 
+                                    style={{
+                                        lineColor: '#F78361',
+                                        lineWidth: 3, 
+                                        lineCap: 'round', 
+                                        lineJoin: 'round'
+                                    }}
+                                />
+                            </ShapeSource>
+                        )}
+                        {destCoordinates && (
+                            <MarkerView coordinate={[destCoordinates.longitude, destCoordinates.latitude]}>
+                                <Image source={require('@/assets/icons/destination.png')} className='h-8 w-8'/>
+                            </MarkerView>
+                        )}
                     </MapView>
                 </View>
                 {destination && (
-                    <TouchableOpacity className='h-14 w-full items-center justify-center rounded-xl bg-tertiary' onPress={openGoogleMaps}>
-                        <Text className='text-white font-staatliches text-2xl'>Take Me</Text>
-                    </TouchableOpacity>
+                    <View className='w-full overflow-hidden rounded-xl'>
+                        <LinearGradient 
+                            className='w-full'
+                            colors={['#F54B64', '#F78361']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                        >
+                            <TouchableOpacity className=' flex-row h-14 w-full items-center justify-center rounded-xl' onPress={openGoogleMaps}>
+                                <Text className='text-white font-staatliches text-3xl'>Go </Text>
+                                <Image source={require('@/assets/icons/arrow-circle-right.png')} resizeMode='contain' className='h-7 w-7'/>
+                            </TouchableOpacity>
+                        </LinearGradient>
+                    </View>
                 )}
             </View>
         </SafeAreaView>

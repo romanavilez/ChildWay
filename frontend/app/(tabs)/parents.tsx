@@ -6,15 +6,18 @@ import { Light } from '@rnmapbox/maps'
 import { LinearGradient } from 'expo-linear-gradient'
 
 const parents = () => {
+    // Use states
     const [selectedParent, setSelectedParent] = useState("mom");
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
+    // Temporary parents to render parent dropdown
     const parents = ["mom", "dad"];
 
     return (
         <SafeAreaView edges={['top']} className='flex-1 bg-secondary'> 
             <View className='flex flex-1 px-2'>
                 <Text className='font-bungee text-3xl color-white pt-3 text-center'>Parents</Text>
+                {/* Parent dropdown */}
                 <View className='relative'>
                     <TouchableOpacity 
                         className='flex-row justify-between items-center w-1/4 h-9 border-2 rounded-xl border-white px-2'
@@ -40,6 +43,7 @@ const parents = () => {
                     )}
                     
                 </View>
+                {/* Chat box */}
                 <View className='flex flex-1 relative w-full rounded-2xl bg-[#12151D] my-2 p-3'>
                     <View className='w-full flex flex-1'>
 

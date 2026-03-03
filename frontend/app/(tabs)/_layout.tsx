@@ -15,6 +15,7 @@ import '../global.css'
 
 import {styles} from '@/assets/styles/index.style'
 
+// Prop types
 type tabBarIconProps = {
     focused: boolean,
     icon: ImageSourcePropType,
@@ -22,7 +23,7 @@ type tabBarIconProps = {
 }
 
 export default function TabLayout() {
-
+    // Handles appearance of tab bar icon when focused or not
     const TabBarIcon = ({focused, icon, activeIcon}: tabBarIconProps) => (
         <View className='flex justify-center items-center mt-8 h-10'>
             {focused ? (

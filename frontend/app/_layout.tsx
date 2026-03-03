@@ -8,6 +8,7 @@ import {useFonts} from 'expo-font'
 import { useEffect } from "react";
 
 export default function RootLayout() {
+  // Set up fonts
   const [fontsLoaded, error] = useFonts({
     "Bungee-Regular": require("../assets/fonts/Bungee-Regular.ttf"),
     "CalSans-Regular": require("../assets/fonts/CalSans-Regular.ttf"),
@@ -18,6 +19,7 @@ export default function RootLayout() {
     "Oswald-Regular": require("../assets/fonts/Oswald-Regular.ttf")
   })
 
+  // Load fonts
   useEffect(() => {
     if (error) throw error;
     if (fontsLoaded) SplashScreen.hideAsync();

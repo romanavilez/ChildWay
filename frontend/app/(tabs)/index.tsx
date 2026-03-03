@@ -14,6 +14,7 @@ import '../global.css'
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN!);
 
+// Prop types
 type suggestPlacesProps = {
     query: string
     longitude: number
@@ -30,6 +31,7 @@ type mapboxSuggestion = {
 }
 
 const Index = () => {
+    // Use States
     const [travelMode, setTravelMode] = useState('');
     const [location, setLocation] = useState<LocationObjectCoords | null>(null);
     const [search, setSearch] = useState('');
@@ -48,6 +50,7 @@ const Index = () => {
         })();
     }, []);
 
+    // Get route only when destination coordinates are available
     useEffect(() => {
         if(!destCoordinates) return;
         getRoute();
@@ -93,7 +96,7 @@ const Index = () => {
         }
     }
 
-    // Return 5 of the closest locations to user, matching the query
+    // Return 5 of the closest locations to user that match the query
     const suggestPlaces = async ({query, longitude, latitude, navProfile} : suggestPlacesProps) => {
         if (!query) return [];
 
@@ -131,7 +134,7 @@ const Index = () => {
         }
     }
 
-    // retrieve coordinates of place selected from suggestions
+    // retrieve coordinates of place that was selected from the suggestions
     const retrievePlace = async (mapboxId: string, sessionToken: string) => {
         const accessToken = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN;
         const url = `https://api.mapbox.com/search/searchbox/v1/retrieve/${mapboxId}?` +
@@ -166,6 +169,7 @@ const Index = () => {
         <SafeAreaView edges={['top']} className='flex-1 bg-secondary'> 
             <View className='flex flex-1 px-2 items-center'>
                 <Text className='font-bungee text-3xl text-white pt-3 w-full text-center'>Map</Text>
+                {/* Search box */}
                 <View className='w-full relative'>
                     <LinearGradient 
                         className={`rounded-2xl ${destination ? 'h-20' : 'h-14'} w-full flex justify-center pl-2 pr-8 overflow-hidden`}
@@ -203,6 +207,7 @@ const Index = () => {
                             <Image source={require('@/assets/icons/cross.png')} resizeMode='contain' className='h-5 w-5'/>
                         </TouchableOpacity>
                     </LinearGradient>
+                    {/* Suggestions list - only render when search has been made */}
                     {suggestions.length > 0 && (
                         <View className='w-full absolute z-10 top-14 rounded-lg bg-slate-800'>
                             <FlatList
@@ -223,6 +228,7 @@ const Index = () => {
                         </View>
                     )}
                 </View>
+                {/* Travel mode options */}
                 <View className='radio-buttons flex-row justify-between w-full gap-1'>
                     <RadioButton 
                         value='walking' 
@@ -246,6 +252,7 @@ const Index = () => {
                         color='#72f38e'
                     />
                 </View>
+                {/* Mapbox Map */}
                 <View className='w-full flex-1 rounded-2xl mb-2 overflow-hidden'> 
                     <MapView style={{flex: 1}}>
                         <Camera followUserLocation followZoomLevel={13}/>
@@ -275,6 +282,7 @@ const Index = () => {
                         )}
                     </MapView>
                 </View>
+                {/* Google Maps navigation button - only render when destination is available */}
                 {destination && (
                     <View className='w-full overflow-hidden rounded-xl'>
                         <LinearGradient 
@@ -293,8 +301,6 @@ const Index = () => {
             </View>
         </SafeAreaView>
     )
-
-    // colors={['#F54B64', '#F78361']}
 }
 
 export default Index;

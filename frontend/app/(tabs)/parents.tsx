@@ -54,9 +54,9 @@ const parents = () => {
     ]
 
     return (
-        <SafeAreaView edges={['top']} className='flex-1 bg-secondary'> 
+        <View className='flex-1 bg-secondary'> 
             <View className='flex flex-1 px-2'>
-                <Text className='font-bungee text-3xl color-white pt-3 text-center'>Parents</Text>
+                <Text className='font-bungee text-3xl color-white text-center'>Parents</Text>
                 {/* Parent dropdown */}
                 <View className='relative'>
                     <TouchableOpacity 
@@ -119,7 +119,7 @@ const parents = () => {
                     </View>
                 </KeyboardAvoidingView>
             </View>
-        </SafeAreaView>
+        </View>
     )
 }
 

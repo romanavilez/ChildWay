@@ -5,9 +5,9 @@ import { LinearGradient } from 'expo-linear-gradient'
 
 const sos = () => {
     return (
-        <SafeAreaView edges={['top']} className='flex-1 bg-secondary'> 
+        <View className='flex-1 bg-secondary'> 
             <View className='flex flex-1 px-2 items-center'>
-                <Text className='font-bungee text-3xl color-white pt-3'>SOS</Text>
+                <Text className='font-bungee text-3xl color-white'>SOS</Text>
                 <View className='w-full flex-1 rounded-2xl bg-[#12151D] mb-2 p-3'>
                     {/* Alert parents button */}
                     <TouchableOpacity className='flex justify-center items-center h-2/5 rounded-t-2xl overflow-hidden'>
@@ -41,7 +41,7 @@ const sos = () => {
                     </TouchableOpacity>
                 </View>
             </View>
-        </SafeAreaView>
+        </View>
     )
 }
 

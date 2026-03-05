@@ -14,6 +14,7 @@ import profileIcon from '@/assets/tabIcons/user.png'
 import '../global.css'
 
 import {styles} from '@/assets/styles/index.style'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 // Prop types
 type tabBarIconProps = {
@@ -35,46 +36,48 @@ export default function TabLayout() {
     )
 
     return (
-        <Tabs
-            screenOptions={{
-                headerShown: false,
-                tabBarShowLabel: false,
-                tabBarStyle: {
-                    height:70,
-                    borderTopWidth: 0,
-                    marginBottom: 40,
-                    backgroundColor: '#12151D'
-                },
-            }}
-        >
-            <Tabs.Screen 
-                name='index'
-                options={{
-                    title: 'Home',
-                    tabBarIcon: ({ focused }) => (<TabBarIcon focused={focused} icon={mapIcon} activeIcon={activeMapIcon}/>)
+        <SafeAreaView className='flex-1 bg-secondary'>
+            <Tabs
+                screenOptions={{
+                    headerShown: false,
+                    tabBarShowLabel: false,
+                    tabBarStyle: {
+                        height:70,
+                        borderTopWidth: 0,
+                        marginBottom: 0,
+                        backgroundColor: '#12151D'
+                    },
                 }}
-            />
-            <Tabs.Screen 
-                name='parents'
-                options={{
-                    title: 'Parents',
-                    tabBarIcon: ({ focused }) => (<TabBarIcon focused={focused} icon={chatIcon} activeIcon={activeChatIcon}/>)
-                }}
-            />
-            <Tabs.Screen 
-                name='sos'
-                options={{
-                    title: 'SOS',
-                    tabBarIcon: ({ focused }) => (<TabBarIcon focused={focused} icon={sosIcon} activeIcon={activeSosIcon}/>)
-                }}
-            />
-            <Tabs.Screen 
-                name='profile'
-                options={{
-                    title: 'Profile',
-                    tabBarIcon: ({ focused }) => (<TabBarIcon focused={focused} icon={profileIcon} activeIcon={activeProfileIcon}/>)
-                }}
-            />
-        </Tabs>
+            >
+                <Tabs.Screen 
+                    name='index'
+                    options={{
+                        title: 'Home',
+                        tabBarIcon: ({ focused }) => (<TabBarIcon focused={focused} icon={mapIcon} activeIcon={activeMapIcon}/>)
+                    }}
+                />
+                <Tabs.Screen 
+                    name='parents'
+                    options={{
+                        title: 'Parents',
+                        tabBarIcon: ({ focused }) => (<TabBarIcon focused={focused} icon={chatIcon} activeIcon={activeChatIcon}/>)
+                    }}
+                />
+                <Tabs.Screen 
+                    name='sos'
+                    options={{
+                        title: 'SOS',
+                        tabBarIcon: ({ focused }) => (<TabBarIcon focused={focused} icon={sosIcon} activeIcon={activeSosIcon}/>)
+                    }}
+                />
+                <Tabs.Screen 
+                    name='profile'
+                    options={{
+                        title: 'Profile',
+                        tabBarIcon: ({ focused }) => (<TabBarIcon focused={focused} icon={profileIcon} activeIcon={activeProfileIcon}/>)
+                    }}
+                />
+            </Tabs>
+        </SafeAreaView>
     )
 }

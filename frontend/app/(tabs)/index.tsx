@@ -166,9 +166,9 @@ const Index = () => {
     }
 
     return (
-        <SafeAreaView edges={['top']} className='flex-1 bg-secondary'> 
+        <View className='flex-1 bg-secondary'> 
             <View className='flex flex-1 px-2 items-center'>
-                <Text className='font-bungee text-3xl text-white pt-3 w-full text-center'>Map</Text>
+                <Text className='font-bungee text-3xl text-white w-full text-center'>Map</Text>
                 {/* Search box */}
                 <View className='w-full relative'>
                     <LinearGradient 
@@ -299,7 +299,7 @@ const Index = () => {
                     </View>
                 )}
             </View>
-        </SafeAreaView>
+        </View>
     )
 }
 

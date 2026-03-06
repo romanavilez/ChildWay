@@ -33,7 +33,7 @@ const sos = () => {
                     <TouchableOpacity className='flex justify-center items-center h-1/2 rounded-2xl mt-4 overflow-hidden'>
                         <LinearGradient 
                             className='absolute w-full h-full'
-                            colors={['#F54B64', '#F78361']}
+                            colors={['#F54B64', '#FE9A3D']}
                             start={{ x: 0, y: 1 }}
                             end={{ x: 1, y: 0 }}
                         />

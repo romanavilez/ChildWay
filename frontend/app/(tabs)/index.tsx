@@ -287,9 +287,9 @@ const Index = () => {
                     <View className='w-full overflow-hidden rounded-xl'>
                         <LinearGradient 
                             className='w-full'
-                            colors={['#F54B64', '#F78361']}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 1 }}
+                            colors={['#F54B64', '#FE9A3D']}
+                            start={{ x: 0, y: 1 }}
+                            end={{ x: 1, y: 0 }}
                         >
                             <TouchableOpacity className=' flex-row h-14 w-full items-center justify-center rounded-xl' onPress={openGoogleMaps}>
                                 <Text className='text-white font-staatliches text-3xl'>Go </Text>

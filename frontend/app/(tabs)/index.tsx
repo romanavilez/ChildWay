@@ -202,6 +202,7 @@ const Index = () => {
                                 setDestination("");
                                 setRoute(null);
                                 setDestCoordinates(null);
+                                setTravelMode('');
                             }}
                         >
                             <Image source={require('@/assets/icons/cross.png')} resizeMode='contain' className='h-5 w-5'/>

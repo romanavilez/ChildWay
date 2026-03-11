@@ -10,48 +10,35 @@ const parents = () => {
     // Use states
     const [selectedParent, setSelectedParent] = useState("mom");
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [messageList, setMessageList] = useState([
+        {"isSending": true, "recipient": "mom", "message": "Hey mom, can I go to the park with Bob?", "time": "4:30 PM"},
+        {"isSending": false, "recipient": "mom", "message": "Have you finished your homework?", "time": "4:31 PM"},
+        {"isSending": true, "recipient": "mom", "message": "Almost", "time": "4:32 PM"},
+        {"isSending": false, "recipient": "mom", "message": "Well when you finish ask me again", "time": "4:35 PM"},
+        {"isSending": true, "recipient": "mom", "message": "I just finished, can I go now?", "time": "5:33 PM"},
+        {"isSending": false, "recipient": "mom", "message": "Yes, you can go now", "time": "5:34 PM"}
+    ]);
+    const [messageText, setMessageText] = useState("");
 
     // Temporary parents to render parent dropdown
     const parents = ["mom", "dad"];
 
-    const messages = [
-        {
-            "isSending": true,
-            "recipient": "mom",
-            "message": "Hey mom, can I go to the park with Bob?",
-            "time": "4:30 PM"
-        },
-        {
-            "isSending": false,
-            "recipient": "mom",
-            "message": "Have you finished your homework?",
-            "time": "4:31 PM"
-        },
-        {
-            "isSending": true,
-            "recipient": "mom",
-            "message": "Almost",
-            "time": "4:32 PM"
-        },
-        {
-            "isSending": false,
-            "recipient": "mom",
-            "message": "Well when you finish ask me again",
-            "time": "4:35 PM"
-        },
-        {
-            "isSending": true,
-            "recipient": "mom",
-            "message": "I just finished, can I go now?",
-            "time": "5:33 PM"
-        },
-        {
-            "isSending": false,
-            "recipient": "mom",
-            "message": "Yes, you can go now",
-            "time": "5:34 PM"
-        }
-    ]
+    // Grab current time in 12 hour format
+    const getCurrentTime = () => {
+        const time = new Date().toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+        return time;
+    }
+
+    // Logic when sending a message
+    const handleSendMessage = () => {
+        const message = {"isSending": true, "recipient": selectedParent, "message": messageText, "time": getCurrentTime()};
+        setMessageList([...messageList, message])
+        setMessageText("");
+    }
 
     return (
         <View className='flex-1 bg-secondary'> 
@@ -90,7 +77,7 @@ const parents = () => {
                         <View className='w-full flex flex-1'>
                             <FlatList
                                 inverted
-                                data={[...messages].reverse()}
+                                data={[...messageList].reverse()}
                                 renderItem={({item}) => {
                                     if (item.recipient !== selectedParent) return null;
                                     return (<ChatBlock isSending={item.isSending} message={item.message} time={item.time}/>)
@@ -102,10 +89,12 @@ const parents = () => {
                         {/* Message box */}
                         <View className='flex w-full flex-row items-center mt-3 gap-2'>
                             <TextInput 
-                                className='flex flex-1 bg-slate-800 rounded-3xl px-3 font-oswald-regular'
+                                className='flex flex-1 bg-slate-800 rounded-3xl px-3 font-oswald-regular text-white'
                                 placeholder='Message'
+                                value={messageText}
+                                onChangeText={setMessageText}
                             />
-                            <TouchableOpacity className='flex justify-center items-center w-12 h-12 overflow-hidden rounded-full'>
+                            <TouchableOpacity className='flex justify-center items-center w-12 h-12 overflow-hidden rounded-full' onPress={() => handleSendMessage()}>
                                 <LinearGradient
                                     className='flex justify-center items-center h-12 w-12'
                                     colors={['#10E5B2', '#72f38e']}

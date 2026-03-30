@@ -1,6 +1,7 @@
 import {View, Text, TouchableOpacity} from 'react-native'
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from 'expo-router';
 import PasswordField from '@/components/PasswordField';
 import InputField from '@/components/InputField';
 import FormButton from '@/components/FormButton';
@@ -11,7 +12,7 @@ const Login = () => {
     const usernameIcon = require('@/assets/icons/user.png');
     
     const handleLogin = () => {
-        
+        router.replace('../(tabs)');
     }
 
     return (
@@ -37,7 +38,7 @@ const Login = () => {
                 {/* Sign up button */}
                 <View className='flex-row mt-10'>
                     <Text className='font-staatliches text-slate-500'>Don't have an account? </Text>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => {router.replace('./sign-up')}}>
                         <Text className='font-staatliches underline text-tertiary'>Sign up</Text>
                     </TouchableOpacity>
                 </View>

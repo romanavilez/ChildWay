@@ -1,17 +1,25 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { useState } from 'react'
+import { View, Text, TouchableOpacity, Image, FlatList } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient'
+import {router} from 'expo-router'
 import PasswordField from '@/components/PasswordField';
 import InputField from '@/components/InputField';
 import FormButton from '@/components/FormButton';
 
 const SignUp = () => {
+    // Use states
+    const [user, setUser] = useState("");
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+
+    // Load icons
     const emailIcon = require('@/assets/icons/envelope.png');
-    const firstNameIcon = require('@/assets/icons/first-name.png');
-    const lastNameIcon = require('@/assets/icons/last-name.png');
+    const nameIcon = require('@/assets/icons/last-name.png');
+
+    const userTypes = ['parent', 'child'];
 
     const handleSignUp = () => {
-        
+        router.replace('./login')
     }
 
     return (
@@ -23,10 +31,37 @@ const SignUp = () => {
                 end={{x:1, y:1}}
             />
             <View className='flex h-auto w-full items-center z-10 bg-secondary rounded-tl-full'>
-                {/* Sign up fields */}
                 <Text className='font-staatliches text-white text-5xl'>Create account</Text>
-                <InputField placeholder='First Name' icon={firstNameIcon} marginTop='mt-10' tint='#FF6F52'/>
-                <InputField placeholder='Last Name' icon={lastNameIcon} tint='#FF6F52'/>
+                {/* User selection */}
+                <View className='flex-row justify-between items-center w-4/5 mt-10 mb-10'>
+                    <Text className='font-staatliches text-white text-xl'>Are you a parent or a child?</Text>
+                    <View className='relative z-10'>
+                        <TouchableOpacity 
+                            className='flex-row items-center space-between rounded-lg p-1 border border-tertiary-two' 
+                            onPress={() => {dropdownOpen ? setDropdownOpen(false) : setDropdownOpen(true)}}
+                            >
+                            <Text className='w-20 font-staatliches text-white'>{user}</Text>
+                            <Image 
+                                source={require('@/assets/icons/dropdown.png')} 
+                                className={`w-5 h-5 ${dropdownOpen ? 'rotate-180' : 'rotate-0'}`} 
+                                style={{tintColor: '#FE9A3D'}}
+                                />
+                        </TouchableOpacity>
+                        {dropdownOpen && (
+                            <FlatList
+                                className='absolute left-0 top-8 w-full rounded-lg mt-1'
+                                data={userTypes}
+                                renderItem={({item}) => (
+                                    <TouchableOpacity className='bg-tertiary-two p-1' onPress={() => {setUser(item); setDropdownOpen(false);}}>
+                                        <Text className='font-staatliches text-white text-center'>{item}</Text>
+                                    </TouchableOpacity>
+                                )}
+                            />
+                        )}                    
+                    </View>
+                </View>
+                {/* Sign up fields */}
+                <InputField placeholder='Full Name' icon={nameIcon} marginTop='mt-10' tint='#FF6F52'/>
                 <InputField placeholder='Email' icon={emailIcon} tint='#FF6F52'/>
                 <PasswordField placeholder='Password' tint='#FF6F52'/>
                 <PasswordField placeholder='Confirm Password' tint='#FF6F52'/>
@@ -35,7 +70,7 @@ const SignUp = () => {
                 {/* Login button */}
                 <View className='flex-row mt-10'>
                     <Text className='font-staatliches text-slate-500'>Already have an account? </Text>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => {router.replace('./login')}}>
                         <Text className='font-staatliches underline text-primary'>Login</Text>
                     </TouchableOpacity>
                 </View>

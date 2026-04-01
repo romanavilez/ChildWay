@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { ConnectDB } from "./lib/db.js";
+import { ConnectDB } from "./src/lib/db.js";
 
 // create Express instance
 const app = express();

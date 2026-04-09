@@ -9,6 +9,7 @@ module.exports = {
         "primary": '#10E5B2',
         "primary-two": "#72f38e",
         "secondary": '#0B0C15',
+        "secondary-two": '#12151D',
         "tertiary": '#FF6F52',
         "tertiary-two": "#FE9A3D"
       },

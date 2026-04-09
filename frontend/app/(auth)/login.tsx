@@ -12,7 +12,7 @@ const Login = () => {
     const usernameIcon = require('@/assets/icons/user.png');
     
     const handleLogin = () => {
-        router.replace('../(tabs)');
+        router.replace('../(parentTabs)');
     }
 
     return (

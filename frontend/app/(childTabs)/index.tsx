@@ -168,7 +168,6 @@ const Index = () => {
     return (
         <View className='flex-1 bg-secondary'> 
             <View className='flex flex-1 px-2 items-center'>
-                <Text className='font-bungee text-3xl text-white w-full text-center'>Map</Text>
                 {/* Search box */}
                 <View className='w-full relative'>
                     <LinearGradient 

@@ -7,6 +7,9 @@ import { StatusBar } from "react-native";
 import {useFonts} from 'expo-font'
 import { useEffect } from "react";
 
+import { useAuthStore } from "@/store/auth.store";
+import { connectSocket, disconnectSocket } from "@/services/socket";
+
 export default function RootLayout() {
   // Set up fonts
   const [fontsLoaded, error] = useFonts({
@@ -25,6 +28,15 @@ export default function RootLayout() {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded, error]);
 
+  // Socket connection
+  const user = useAuthStore((state) => state.username);
+  
+  useEffect(() => {
+    if (!user) return;
+    connectSocket(user);
+    return () => disconnectSocket();
+  }, [user])
+  
   if (!fontsLoaded) return null;
 
   return (

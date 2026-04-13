@@ -28,7 +28,7 @@ app.use("/api/safeZones", safeZoneRoutes);
 app.use("/api/users", userRoutes);
 
 // Create http server
-const httpServer = createServer();
+const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: { origin: "*" }
 });

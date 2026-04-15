@@ -11,6 +11,8 @@ const SignUp = () => {
     // Use states
     const [user, setUser] = useState("");
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [fullName, setFullName] = useState("");
+    const [email, setEmail] = useState("");
 
     // Load icons
     const emailIcon = require('@/assets/icons/envelope.png');
@@ -61,8 +63,8 @@ const SignUp = () => {
                     </View>
                 </View>
                 {/* Sign up fields */}
-                <InputField placeholder='Full Name' icon={nameIcon} marginTop='mt-10' tint='#FF6F52'/>
-                <InputField placeholder='Email' icon={emailIcon} tint='#FF6F52'/>
+                <InputField placeholder='Full Name' icon={nameIcon} value={fullName} onChangeText={setFullName} marginTop='mt-10' tint='#FF6F52'/>
+                <InputField placeholder='Email' icon={emailIcon} value={email} onChangeText={setEmail} tint='#FF6F52'/>
                 <PasswordField placeholder='Password' tint='#FF6F52'/>
                 <PasswordField placeholder='Confirm Password' tint='#FF6F52'/>
                 {/* Sign up button */}

@@ -4,11 +4,13 @@ import React from 'react'
 type inputFieldProps = {
     placeholder: string
     icon: ImageSourcePropType
+    value: string
+    onChangeText: (value:string) => void
     marginTop?: string
     tint?: string
 }
 
-const InputField = ({placeholder, icon, marginTop, tint}: inputFieldProps) => {
+const InputField = ({placeholder, icon, value, onChangeText, marginTop, tint}: inputFieldProps) => {
 
 
     return (
@@ -17,6 +19,8 @@ const InputField = ({placeholder, icon, marginTop, tint}: inputFieldProps) => {
                 className='flex-1 w-full h-full text-secondary font-oswald-light'
                 placeholder={placeholder}
                 placeholderTextColor={'#999'}
+                value={value}
+                onChangeText={onChangeText}
             />
             <Image source={icon} className='w-5 h-5' style={tint && {tintColor: tint}}/>
         </View>

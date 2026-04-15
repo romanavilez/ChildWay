@@ -1,20 +1,41 @@
 import { View, Text } from 'react-native'
-import React, {useEffect} from 'react'
-import { requestForegroundPermissionsAsync } from 'expo-location';
-import Mapbox, {Camera, MapView, LocationPuck} from '@rnmapbox/maps'
+import React, {useEffect, useState, useCallback} from 'react'
+import { useFocusEffect } from '@react-navigation/native';
+import Mapbox, {Camera, MapView, LocationPuck} from '@rnmapbox/maps';
+
+import { getSocket } from '@/services/socket';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN!);
 
 export default function index() {
-    // Ask user for location permission
-    useEffect(() => {
-        (async () => {
-            const {status} = await requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                console.log('Location Permission Denied!');
-            }
-        })();
-    }, []);
+    // Use states
+    const [children, setChildren] = useState(["ravilez", "bjr"]);
+    const [childLocations, setChildLocations] = useState({});
+
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         const socket = getSocket();
+    //         if (!socket) return;
+
+    //         const handleConnect = () => {
+    //             console.log("Socket id:", socket.id);
+    //             for (const child of children) {
+    //                 console.log("joining child:", child)
+    //                 socket.emit("join_child", child);
+    //             }
+    //         }
+
+    //         if (socket.connected) handleConnect();
+    //         else socket.once("connect", handleConnect);
+
+    //         return () => {
+    //             for (const child of children) {
+    //                 console.log("leaving child:", child);
+    //                 socket.emit("leave_child", child);
+    //             }
+    //         }
+    //     }, [children])
+    // );
 
     return (
         <View className='flex-1 bg-secondary'>

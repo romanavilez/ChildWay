@@ -11,11 +11,11 @@ type AuthState = {
 
 export const useAuthStore = create<AuthState>((set) => ({
     username: "ravilez",
-    userType: "parent",
+    userType: "child",
     token: "",
     login: (username, token) => {set({username, token})},
     logout: () => {
-        set({username:null, token:null})
+        set({username:null, token:null, userType:null})
     },
     setType: (userType) => {set({userType})}
 }))

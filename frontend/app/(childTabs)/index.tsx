@@ -2,7 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, Image, Alert, FlatList, Linkin
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Mapbox, {Camera, LineLayer, LocationPuck, MapView, ShapeSource, MarkerView, Images} from '@rnmapbox/maps'
-import {requestForegroundPermissionsAsync, getCurrentPositionAsync, LocationObjectCoords} from 'expo-location'
+import {getCurrentPositionAsync, LocationObjectCoords} from 'expo-location'
 import {LinearGradient} from 'expo-linear-gradient'
 import { v4 as uuidv4} from 'uuid'
 import 'react-native-get-random-values'
@@ -39,16 +39,6 @@ const Index = () => {
     const [destination, setDestination] = useState("");
     const [destCoordinates, setDestCoordinates] = useState<LocationObjectCoords | null>(null);
     const [route, setRoute] = useState<any>(null);
-
-    // Ask user for location permission
-    useEffect(() => {
-        (async () => {
-            const {status} = await requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                console.log('Location Permission Denied!');
-            }
-        })();
-    }, []);
 
     // Get route only when destination coordinates are available
     useEffect(() => {

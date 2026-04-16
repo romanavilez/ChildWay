@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, FlatList } from 'react-native'
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import Mapbox, {MapView, Camera, LocationPuck} from '@rnmapbox/maps'
 import ChildCard from '@/components/ChildCard'
 import { getSocket } from '@/services/socket'
@@ -33,6 +33,7 @@ export default function children() {
                 for (const child of children) {
                     console.log("joining child:", child)
                     socket.emit("join_child", child);
+                    socket.emit("start_sending_location", child);
                 }
             }
             // handle connection when socket connects
@@ -40,6 +41,7 @@ export default function children() {
             else socket.once("connect", handleConnect);
             // Append new child and location or update location
             const handleLocationUpdate = (data:LocationUpdateProps) => {
+                console.log("handle location update");
                 setChildLocations(prev => ({
                     ...prev,
                     [data.childId] : {lng:data.longitude, lat:data.latitude}
@@ -47,10 +49,10 @@ export default function children() {
             }
             socket.on("location_update", handleLocationUpdate);
 
-            console.log(childLocations);
             // leave all rooms and turn off existing sockets
             return () => {
                 for (const child of children) {
+                    socket.emit("stop_sending_location", child);
                     console.log("leaving child:", child);
                     socket.emit("leave_child", child);
                 }
@@ -59,6 +61,11 @@ export default function children() {
         }, [children])
     );
 
+    useEffect(() => {
+        console.log("child locations:", childLocations);
+    }, [childLocations])
+    
+
     return (
         <View className='flex-1 bg-secondary p-2'>
             <View className='flex bg-secondary-two rounded-2xl p-2'>
@@ -66,14 +73,13 @@ export default function children() {
                     data={children}
                     renderItem={({item}) => {
                         let location = childLocations[item];
-                        if (!location) return null;
                         return (
                             <ChildCard
                                 name={item}
                                 distance={Math.random() * 3}
                                 status='Stationary'
-                                longitude={location?.lng ?? 0}
-                                latitude={location?.lat ?? 0}
+                                longitude={location?.lng || null}
+                                latitude={location?.lat || null}
                                 setScroll={setScrollEnabled}
                             />
                         )

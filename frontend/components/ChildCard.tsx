@@ -6,8 +6,8 @@ type ChildCardProps = {
     name: string
     distance: number
     status: string
-    longitude: number
-    latitude: number
+    longitude: number | null
+    latitude: number | null
     setScroll: React.Dispatch<React.SetStateAction<boolean>>
 }
 
@@ -28,10 +28,14 @@ export default function ChildCard({name, distance, status, longitude, latitude, 
                             origin: require('@/assets/icons/origin.png')
                         }}
                     />
-                    <Camera centerCoordinate={[longitude, latitude]} zoomLevel={13}/>
-                    <MarkerView coordinate={[longitude, latitude]} anchor={{x:0.5, y:1}}>
-                        <Image source={require('@/assets/icons/map-marker-smile.png')} style={{height: 30, width: 30}} resizeMode='contain'/>
-                    </MarkerView>
+                    {longitude && latitude && (
+                        <View>
+                            <Camera centerCoordinate={[longitude, latitude]} zoomLevel={13}/>
+                            <MarkerView coordinate={[longitude, latitude]} anchor={{x:0.5, y:1}}>
+                                <Image source={require('@/assets/icons/map-marker-smile.png')} style={{height: 30, width: 30}} resizeMode='contain'/>
+                            </MarkerView>
+                        </View>
+                    )}
                 </MapView>  
             </View>
             {/* Alerts */}

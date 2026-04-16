@@ -20,7 +20,7 @@ const Login = () => {
 
     // state functions
     const login = useAuthStore((state) => state.login);
-    const setType = useAuthStore((state) => state.setType); 
+    const setRole = useAuthStore((state) => state.setRole); 
     
     // Verify user exists in database and log them in
     const handleLogin = async () => {
@@ -33,12 +33,14 @@ const Login = () => {
             });
             // Store data returned
             const data = await res.json();
+            const role = data.user.role;
 
             if (res.ok) {
                 // Update auth store and route user to role-based interface
                 login(username, "");
-                if (data.user.role === "parent") router.replace('../(parentTabs)');
-                else if (data.user.role === "child") router.replace('../(childTabs)');
+                setRole(role);
+                if (role === "parent") router.replace('../(parentTabs)');
+                else if (role === "child") router.replace('../(childTabs)');
             } else {
                 console.log("login failed");
             }

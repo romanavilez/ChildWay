@@ -29,9 +29,11 @@ export const initSockets = (io) => {
         if (socket.role === "child") {
             // child joins its own room
             socket.join(`child:${userId}`);
-            // send location data
-            socket.on("start_sending_location", () => {
-                socket.to(`child:${userId}`).emit("start_sending_location");
+            console.log({userId}, ":", socket.rooms);
+            // receive location
+            socket.on("location_update", (data) => {
+                console.log("location update");
+                socket.to(`child:${data.childId}`).emit("location_update", (data));
             })
         } else if (socket.role === "parent") {
             // verify that user is child's parent and join room
@@ -40,7 +42,16 @@ export const initSockets = (io) => {
                 db.query(query, [userId, childId], (err, results=[]) => {
                     if (results.length === 0) return socket.emit("error", "Not a parent");
                     socket.join(`child:${childId}`);
+                    console.log({userId}, ":", socket.rooms);
                 });
+            });
+            // send location data
+            socket.on("start_sending_location", (childId) => {
+                socket.to(`child:${childId}`).emit("start_sending_location");
+            });
+            // stop sending location data
+            socket.on("stop_sending_location", (childId) => {
+                socket.to(`child:${childId}`).emit("stop_sending_location");
             });
         } 
         // Leave child's room

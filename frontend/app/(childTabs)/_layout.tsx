@@ -2,14 +2,10 @@ import { View, Text, Image, ImageSourcePropType } from 'react-native'
 import React from 'react'
 import { Tabs } from 'expo-router'
 
-import activeMapIcon from '@/assets/tabIcons/active-map.png'
-import activeChatIcon from '@/assets/tabIcons/active-chat.png'
-import activeSosIcon from '@/assets/tabIcons/active-sos.png'
-import activeProfileIcon from '@/assets/tabIcons/active-user.png'
 import mapIcon from '@/assets/tabIcons/map.png'
-import chatIcon from '@/assets/tabIcons/chat.png'
+import messagesIcon from '@/assets/tabIcons/messages.png'
 import sosIcon from '@/assets/tabIcons/sos.png'
-import profileIcon from '@/assets/tabIcons/user.png'
+import profileIcon from '@/assets/tabIcons/profile.png'
 
 import '../global.css'
 
@@ -19,19 +15,20 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 // Prop types
 type tabBarIconProps = {
     focused: boolean,
-    icon: ImageSourcePropType,
-    activeIcon: ImageSourcePropType
+    icon: ImageSourcePropType
+    tabName: string
 }
 
 export default function TabLayout() {
     // Handles appearance of tab bar icon when focused or not
-    const TabBarIcon = ({focused, icon, activeIcon}: tabBarIconProps) => (
-        <View className='flex justify-center items-center mt-8 h-10'>
+    const TabBarIcon = ({focused, icon, tabName}: tabBarIconProps) => (
+        <View className='flex justify-center items-center mt-10 h-12' style={{width:60}}>
             {focused ? (
-                <Image source={activeIcon} resizeMode='contain' style={{height: 50, width: 50}} />
+                <Image source={icon} resizeMode='contain' style={{height: 25, width: 25, tintColor: 'white'}} />
             ) : (
-                <Image source={icon} resizeMode='contain' style={{height: 50, width: 50}} />
+                <Image source={icon} resizeMode='contain' style={{height: 25, width: 25, tintColor: "#64748B"}} />
             )}
+            <Text className={`font-staatliches text-sm ${focused ? 'text-white' : 'text-[#64748b]'}`}>{tabName}</Text>
         </View>
     )
 
@@ -53,28 +50,28 @@ export default function TabLayout() {
                     name='index'
                     options={{
                         title: 'Home',
-                        tabBarIcon: ({ focused }) => (<TabBarIcon focused={focused} icon={mapIcon} activeIcon={activeMapIcon}/>)
+                        tabBarIcon: ({ focused }) => (<TabBarIcon focused={focused} icon={mapIcon} tabName='Map'/>)
                     }}
                 />
                 <Tabs.Screen 
                     name='parents'
                     options={{
                         title: 'Parents',
-                        tabBarIcon: ({ focused }) => (<TabBarIcon focused={focused} icon={chatIcon} activeIcon={activeChatIcon}/>)
+                        tabBarIcon: ({ focused }) => (<TabBarIcon focused={focused} icon={messagesIcon} tabName='Messages'/>)
                     }}
                 />
                 <Tabs.Screen 
                     name='sos'
                     options={{
                         title: 'SOS',
-                        tabBarIcon: ({ focused }) => (<TabBarIcon focused={focused} icon={sosIcon} activeIcon={activeSosIcon}/>)
+                        tabBarIcon: ({ focused }) => (<TabBarIcon focused={focused} icon={sosIcon} tabName='SOS'/>)
                     }}
                 />
                 <Tabs.Screen 
                     name='profile'
                     options={{
                         title: 'Profile',
-                        tabBarIcon: ({ focused }) => (<TabBarIcon focused={focused} icon={profileIcon} activeIcon={activeProfileIcon}/>)
+                        tabBarIcon: ({ focused }) => (<TabBarIcon focused={focused} icon={profileIcon} tabName='Profile'/>)
                     }}
                 />
             </Tabs>

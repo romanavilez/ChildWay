@@ -3,10 +3,12 @@ import React, {useState} from 'react'
 
 type passwordFieldProps = {
     placeholder: string
+    value: string
+    onChangeText: (value:string) => void
     tint?: string
 }
 
-const PasswordField = ({placeholder, tint}: passwordFieldProps) => {
+const PasswordField = ({placeholder, value, onChangeText, tint}: passwordFieldProps) => {
     const [passwordVisible, setPasswordVisible] = useState(false);
     
     let passwordPath = null;
@@ -22,6 +24,8 @@ const PasswordField = ({placeholder, tint}: passwordFieldProps) => {
                 className='flex-1 w-full h-full text-secondary font-oswald-light'
                 placeholder={placeholder}
                 placeholderTextColor={'#999'}
+                value={value}
+                onChangeText={onChangeText}
                 secureTextEntry={!passwordVisible}
             />
             <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>

@@ -1,4 +1,4 @@
-import {View, Text, TouchableOpacity} from 'react-native'
+import {View, Text, TouchableOpacity, KeyboardAvoidingView, Alert} from 'react-native'
 import { useState } from 'react';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -29,25 +29,27 @@ const Login = () => {
             const res = await fetch("http://10.0.0.99:5001/api/users/login", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({username})
+                body: JSON.stringify({username, password})
             });
+
             // Store data returned
             const data = await res.json();
-            const role = data.user.role;
-
+            
             if (res.ok) {
-                // Update auth store and route user to role-based interface
+                // grab user role
+                const role = data.role;
+                // Update auth store
                 login(username, "");
                 setRole(role);
+                // route user to role-based interface
                 if (role === "parent") router.replace('../(parentTabs)');
                 else if (role === "child") router.replace('../(childTabs)');
             } else {
-                console.log("login failed");
+                Alert.alert("Login Failed", data.error);
             }
         } catch (error) {
             console.log("Error logging in:", error);
         }
-
     }
 
     return (
@@ -58,26 +60,28 @@ const Login = () => {
                 start={{x:0, y:1}}
                 end={{x:1, y:0}}
             />
-            <View className='h-auto justify-center items-center w-full bg-secondary rounded-tl-full'>
-                <Text className='text-white text-5xl font-staatliches mt-10'>Welcome Back!</Text>
-                <Text className='text-slate-500 font-staatliches text-xl'>Enter Your Username & Password</Text>
-                {/* Username field */}
-                <InputField placeholder='Username' icon={usernameIcon} value={username} onChangeText={setUsername} marginTop='mt-10'/>
-                {/* Password field */}
-                <PasswordField placeholder="Password"/>
-                {/* Login button */}
-                <FormButton text='Login' gradientLeft='#10E5B2' gradientRight='#72f38e' onPress={handleLogin}/>
-                <TouchableOpacity className='mt-3'>
-                    <Text className='text-slate-500 font-staatliches'>Forgot password?</Text>
-                </TouchableOpacity>
-                {/* Sign up button */}
-                <View className='flex-row mt-10'>
-                    <Text className='font-staatliches text-slate-500'>Don't have an account? </Text>
-                    <TouchableOpacity onPress={() => {router.replace('./sign-up')}}>
-                        <Text className='font-staatliches underline text-tertiary'>Sign up</Text>
+            <KeyboardAvoidingView className='w-full' behavior='padding' keyboardVerticalOffset={-30}>
+                <View className='h-auto justify-center items-center w-full bg-secondary rounded-tl-full'>
+                    <Text className='text-white text-5xl font-staatliches mt-10'>Welcome Back!</Text>
+                    <Text className='text-slate-500 font-staatliches text-xl'>Enter Your Username & Password</Text>
+                    {/* Username field */}
+                    <InputField placeholder='Username' icon={usernameIcon} value={username} onChangeText={setUsername} marginTop='mt-10'/>
+                    {/* Password field */}
+                    <PasswordField placeholder="Password" value={password} onChangeText={setPassword}/>
+                    {/* Login button */}
+                    <FormButton text='Login' gradientLeft='#10E5B2' gradientRight='#72f38e' onPress={handleLogin}/>
+                    <TouchableOpacity className='mt-3'>
+                        <Text className='text-slate-500 font-staatliches'>Forgot password?</Text>
                     </TouchableOpacity>
+                    {/* Sign up button */}
+                    <View className='flex-row mt-10'>
+                        <Text className='font-staatliches text-slate-500'>Don't have an account? </Text>
+                        <TouchableOpacity onPress={() => {router.replace('./sign-up')}}>
+                            <Text className='font-staatliches underline text-tertiary'>Sign up</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-            </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     )
 }

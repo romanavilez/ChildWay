@@ -6,7 +6,8 @@ export const createTables = async () => {
         CREATE TABLE IF NOT EXISTS user (
             username VARCHAR(255) UNIQUE NOT NULL PRIMARY KEY,
             password_hash VARCHAR(255) NOT NULL,
-            full_name VARCHAR(100) NOT NULL,
+            email VARCHAR(255) UNIQUE NOT NULL,
+            name VARCHAR(100),
             role VARCHAR(7) NOT NULL CHECK(role IN ('child', 'parent')),
             profile_pic VARCHAR(512)
         );

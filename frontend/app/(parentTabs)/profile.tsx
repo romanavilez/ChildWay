@@ -77,11 +77,11 @@ export default function profile() {
                 animationType='fade'
             >
                 <View className='flex justify-center items-center w-full h-full'>
-                    <View className='w-[90%] h-1/2 bg-slate-500 p-2 rounded-2xl' style={{overflow:'hidden'}}>
+                    <View className='w-[90%] h-1/2 bg-secondary-two p-2 rounded-2xl border-4 border-tertiary-two' style={{overflow:'hidden'}}>
                         <View className='flex-row justify-between w-full'>
-                            <Text className='font-staatliches text-3xl text-secondary'>Scan Code</Text>
-                            <TouchableOpacity onPress={handleClose}>
-                                <Image source={require('@/assets/icons/cross.png')} className='w-6 h-6' resizeMode='contain' style={{tintColor:'#0B0C15'}}/>
+                            <Text className='font-staatliches text-3xl text-tertiary-two'>Scan Code</Text>
+                            <TouchableOpacity className="p-2" onPress={handleClose}>
+                                <Image source={require('@/assets/icons/cross.png')} className='w-6 h-6' resizeMode='contain' style={{tintColor:'#FE9A3D'}}/>
                             </TouchableOpacity>
                         </View>
                         <Text className='font-staatliches text-xl text-slate-200'>Scan code from child app to link child</Text>

@@ -61,20 +61,20 @@ const profile = () => {
                 animationType='fade'
             >
                 <View className='flex justify-center items-center w-full h-full'>
-                    <View className='w-[90%] h-1/2 bg-slate-500 p-2 rounded-2xl'>
+                    <View className='w-[90%] h-1/2 bg-secondary-two p-2 rounded-2xl border-4 border-primary-two'>
                         <View className='flex-row justify-between w-full'>
-                            <Text className='font-staatliches text-3xl text-secondary'>QR Code</Text>
-                            <TouchableOpacity onPress={() => setShowQr(false)}>
-                                <Image source={require('@/assets/icons/cross.png')} className='w-6 h-6' resizeMode='contain' style={{tintColor:'#0B0C15'}}/>
+                            <Text className='font-staatliches text-3xl text-primary-two'>QR Code</Text>
+                            <TouchableOpacity onPress={() => setShowQr(false)} className='p-2'>
+                                <Image source={require('@/assets/icons/cross.png')} className='w-6 h-6' resizeMode='contain' style={{tintColor:'#72F38E'}}/>
                             </TouchableOpacity>
                         </View>
-                        <Text className='font-staatliches text-xl text-slate-200'>Scan this code in the parent app</Text>
+                        <Text className='font-staatliches text-xl text-slate-300'>Scan this code in the parent app</Text>
                         <View className='flex-1 w-full justify-center items-center'>
                             <View className='justify-center items-center w-[230] h-[230] bg-slate-300 rounded-2xl'>
                                 {linkToken && <QRCode value={qrValue} size={200} backgroundColor='#CBD5E1'/>}
                             </View>
                             <View className='w-[230]'>
-                                <Text className='font-oswald-extralight text-center'>
+                                <Text className='font-oswald-extralight text-center text-slate-300'>
                                     Your QR code is private. If you share it with someone, they can scan it on their ChildWay camera to add you as a child.
                                 </Text>
                             </View>

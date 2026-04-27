@@ -24,6 +24,9 @@ const Login = () => {
     
     // Verify user exists in database and log them in
     const handleLogin = async () => {
+        // Missing username or password
+        if (!username || !password) return Alert.alert("Missing required fields", "Please enter all required fields to continue");
+
         try {
             // POST login
             const res = await fetch("http://10.0.0.99:5001/api/users/login", {

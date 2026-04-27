@@ -1,15 +1,13 @@
 import { View, Text, TextInput, TouchableOpacity, Image, Alert, FlatList, Linking } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef, Ref } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import 'react-native-get-random-values'
 import Mapbox, {Camera, LineLayer, LocationPuck, MapView, ShapeSource, MarkerView, Images} from '@rnmapbox/maps'
+import {Feature, LineString} from "geojson"
 import {getCurrentPositionAsync, LocationObjectCoords} from 'expo-location'
 import {LinearGradient} from 'expo-linear-gradient'
-import { v4 as uuidv4} from 'uuid'
-import 'react-native-get-random-values'
-import {Feature, LineString} from "geojson"
-
 import RadioButton from '@/components/RadioButton'
-
+import { v4 as uuidv4} from 'uuid'
 import '../global.css'
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN!);
@@ -31,6 +29,9 @@ type mapboxSuggestion = {
 }
 
 const Index = () => {
+    // Use Refs
+    const textInputRef = useRef<TextInput | null>(null);
+
     // Use States
     const [travelMode, setTravelMode] = useState('');
     const [location, setLocation] = useState<LocationObjectCoords | null>(null);
@@ -39,6 +40,7 @@ const Index = () => {
     const [destination, setDestination] = useState("");
     const [destCoordinates, setDestCoordinates] = useState<LocationObjectCoords | null>(null);
     const [route, setRoute] = useState<any>(null);
+    const [searchFocus, setSearchFocus] = useState(false);
 
     // Get route only when destination coordinates are available
     useEffect(() => {
@@ -160,19 +162,21 @@ const Index = () => {
             <View className='flex flex-1 px-2 items-center'>
                 {/* Search box */}
                 <View className='w-full relative'>
-                    <LinearGradient 
-                        className={`rounded-2xl ${destination ? 'h-20' : 'h-14'} w-full flex justify-center pl-2 pr-8 overflow-hidden`}
-                        colors={['#10E5B2', '#72f38e']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
+                    <View 
+                        className={
+                            `rounded-2xl w-full flex justify-center pl-2 pr-8 overflow-hidden bg-secondary-two border-2
+                            ${destination ? 'h-20' : 'h-14'}
+                            ${searchFocus ? 'border-white' : 'border-transparent'}`
+                        }
                     >
                         <TextInput 
                             className={`color-white ${destination ? 'h-28' : 'h-14'} w-full font-staatliches text-xl`} 
                             placeholder='Where are you heading?'
+                            ref={textInputRef}
                             textAlign='center'
                             value={search}
                             onChangeText={(text) => setSearch(text)}
-                            onFocus={getLocation}
+                            onFocus={() => {getLocation; setSearchFocus(true)}}
                             onSubmitEditing={(event) => {
                                 const query = event.nativeEvent.text;
                                 if (location) {
@@ -192,11 +196,13 @@ const Index = () => {
                                 setRoute(null);
                                 setDestCoordinates(null);
                                 setTravelMode('');
+                                setSearchFocus(false);
+                                if (textInputRef.current) textInputRef.current.blur();
                             }}
                         >
                             <Image source={require('@/assets/icons/cross.png')} resizeMode='contain' className='h-5 w-5'/>
                         </TouchableOpacity>
-                    </LinearGradient>
+                    </View>
                     {/* Suggestions list - only render when search has been made */}
                     {suggestions.length > 0 && (
                         <View className='w-full absolute z-10 top-14 rounded-lg bg-slate-800'>

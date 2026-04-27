@@ -103,4 +103,19 @@ export const createTables = async () => {
         if (err) throw err;
         console.log("location table created!");
     });
+
+    // Link token table creation
+    const linkToken = `
+        CREATE TABLE IF NOT EXISTS link_token (
+            token_id CHAR(32) UNIQUE NOT NULL PRIMARY KEY,
+            child_id VARCHAR(255) NOT NULL,
+            expires_at DATETIME NOT NULL,
+            used BOOLEAN NOT NULL,
+            FOREIGN KEY (child_id) REFERENCES user(username)
+        );
+    `
+    db.query(linkToken, (err) => {
+        if (err) throw err;
+        console.log("Link token table created!");
+    })
 };

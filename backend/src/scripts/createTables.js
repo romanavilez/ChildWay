@@ -22,6 +22,7 @@ export const createTables = async () => {
         CREATE TABLE IF NOT EXISTS parent_child (
             parent_id VARCHAR(255) NOT NULL,
             child_id VARCHAR(255) NOT NULL,
+            PRIMARY KEY (parent_id, child_id),
             FOREIGN KEY (parent_id) REFERENCES user(username),
             FOREIGN KEY (child_id) REFERENCES user(username)
         );

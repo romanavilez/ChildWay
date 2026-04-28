@@ -11,7 +11,10 @@ router.post("/pair-child", (req, res) => {
         "INSERT INTO parent_child (parent_id, child_id) VALUES (?,?)",
         [parentId, childId],
         (err, result) => {
-            if (err) return res.status(500).json({error: "Database error"});
+            if (err) {
+                if (err.code === "ER_DUP_ENTRY") return res.status(409).json({error: `Already added ${childId} to your account`});
+                else return res.status(500).json({error: "Database error"});
+            }
             return res.status(200).json({success:true});
         }
     );

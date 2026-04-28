@@ -44,6 +44,6 @@ initSockets(io);
 await ConnectDB();
 
 // Start server
-httpServer.listen(5001, () => {
+httpServer.listen(5001, "0.0.0.0", () => {
     console.log("Server is running on port 5001");
 })

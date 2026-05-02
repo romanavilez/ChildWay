@@ -11,6 +11,7 @@ import safeZoneRoutes from "./src/routes/safeZones.js";
 import userRoutes from "./src/routes/users.js";
 import linkTokenRoutes from "./src/routes/linkTokens.js";
 import parentChildRoutes from "./src/routes/parentChild.js";
+import pushTokenRoutes from "./src/routes/pushTokens.js";
 
 import { initSockets } from "./src/sockets/socketHandler.js";
 
@@ -30,6 +31,7 @@ app.use("/api/safeZones", safeZoneRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/linkTokens", linkTokenRoutes);
 app.use("/api/parentChildren", parentChildRoutes);
+app.use("/api/pushTokens", pushTokenRoutes);
 
 // Create http server
 const httpServer = createServer(app);

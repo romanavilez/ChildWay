@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "ChildWay",
-    "slug": "ChildWay",
+    "slug": "childway",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "ChildWay",
@@ -16,7 +16,12 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.ravilez.ChildWay"
+      "package": "com.ravilez.ChildWay",
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -31,11 +36,19 @@
         }
       ],
       "expo-router",
-      "@rnmapbox/maps"
+      "@rnmapbox/maps",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8c607237-567c-4424-9677-67509bdfa8be"
+      }
+    },
+    "owner": "ravilez"
   }
 }

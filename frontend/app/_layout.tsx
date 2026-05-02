@@ -9,6 +9,7 @@ import { requestForegroundPermissionsAsync } from "expo-location";
 
 import { useAuthStore } from "@/store/auth.store";
 import { connectSocket, disconnectSocket } from "@/services/socket";
+import { useNotifications } from "@/hooks/useNotifications";
 
 export default function RootLayout() {
   // Set up fonts
@@ -41,12 +42,13 @@ export default function RootLayout() {
   // Socket connection
   const user = useAuthStore((state) => state.username);
   const userType = useAuthStore((state) => state.userType);
-  
   useEffect(() => {
     if (!user || !userType) return;
     connectSocket(user, userType);
     return () => disconnectSocket();
   }, [user])
+
+  useNotifications(user);
   
   if (!fontsLoaded) return null;
 

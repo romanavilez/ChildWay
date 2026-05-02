@@ -1,12 +1,12 @@
 import { create } from "zustand"
 
 type AuthState = {
-    username: String | null
-    userType: String | null
-    token: String | null
-    login: (username:String, token:String) => void
+    username: string | null
+    userType: string | null
+    token: string | null
+    login: (username:string, token:string) => void
     logout: () => void
-    setRole: (userType:String) => void
+    setRole: (userType:string) => void
 }
 
 export const useAuthStore = create<AuthState>((set) => ({

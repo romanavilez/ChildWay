@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { router } from 'expo-router'
 import { useAuthStore } from '@/store/auth.store'
 import { Camera, CameraView, BarcodeScanningResult} from 'expo-camera'
+import * as Notifications from "expo-notifications"
 
 export default function profile() {
     // Auth store
@@ -78,6 +79,31 @@ export default function profile() {
         setScanned(false);
     }
 
+    const sendNotification = async () => {
+        // await Notifications.scheduleNotificationAsync({
+        //     content: {
+        //         title: "Testing notification",
+        //         body: "Here is the notification body",
+        //         data: {type: "test"}
+        //     },
+        //     trigger: null
+        // })
+        try {
+            const title = "Test Message";
+            const body = "This message is being sent to ravilez";
+            const data = {type: "test"}
+            const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/pushTokens/send-message/ravilez`, {
+                method: "POST",
+                headers: {"Content-Type" : "application/json"},
+                body: JSON.stringify({title, body, data})
+            });
+    
+            if (res.ok) console.log("message sent");
+        } catch (error) {
+            console.log("Couldn't send notification:", error);
+        }
+    }
+
     return (
         <View className='flex-1 bg-secondary'>
             <View className='flex flex-1 px-2 items-center justify-center'>
@@ -92,6 +118,12 @@ export default function profile() {
                     onPress={() => {logout(); router.replace('/(auth)/login')}}
                 >
                     <Text className='font-staatliches text-2xl'>Log out</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                    className='flex items-center justify-center bg-white w-5/6 h-20 rounded-3xl mt-2'
+                    onPress={sendNotification}
+                >
+                    <Text className='font-staatliches text-2xl'>Send Notification</Text>
                 </TouchableOpacity>
             </View>
             {/* QR code scanner */}

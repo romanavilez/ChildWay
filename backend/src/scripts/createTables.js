@@ -118,5 +118,19 @@ export const createTables = async () => {
     db.query(linkToken, (err) => {
         if (err) throw err;
         console.log("Link token table created!");
+    });
+
+    // Push token table creation
+    const pushToken = `
+        CREATE TABLE IF NOT EXISTS push_token (
+            device_id VARCHAR(36) NOT NULL UNIQUE PRIMARY KEY,
+            token VARCHAR(255) NOT NULL UNIQUE,
+            user_id VARCHAR(255) NOT NULL,
+            platform TEXT CHECK (platform IN ('ios', 'android'))
+        );
+    `
+    db.query(pushToken, (err) => {
+        if (err) throw err;
+        console.log("Push token table created!");
     })
 };

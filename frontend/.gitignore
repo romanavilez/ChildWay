@@ -45,3 +45,6 @@ app-example
 
 # Firebase
 childway-firebase.json
+
+# Google services
+google-services.json

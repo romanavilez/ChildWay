@@ -9,7 +9,6 @@ router.post("/send-location", (req, res) => {
 
     try {
         const {childId, time, lng, lat, speed} = req.body;
-        console.log(childId, time, lng, lat, speed);
         
         io.to(`child:${childId}`).emit("location_update", {childId, lng, lat, speed});
 

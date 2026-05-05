@@ -34,7 +34,6 @@ export default function index() {
             
             // Append new child and location or update location
             const handleLocationUpdate = (data:LocationUpdateProps) => {
-                console.log("handle location update:", data);
                 setChildLocations(prev => ({
                     ...prev,
                     [data.childId] : {lng:data.lng, lat:data.lat, speed:data.speed}

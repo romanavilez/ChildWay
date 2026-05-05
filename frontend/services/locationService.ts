@@ -4,8 +4,6 @@ import { useAuthStore } from '@/store/auth.store';
 
 export const LOCATION_TASK = "location-task";
 
-let count = 0;
-
 TaskManager.defineTask(LOCATION_TASK, async ({data, error}) => {
     if (error) {
         console.log("Task manager error:", error);
@@ -19,8 +17,6 @@ TaskManager.defineTask(LOCATION_TASK, async ({data, error}) => {
         return;
     }
 
-    count++;
-    console.log("Task firing:", count);
     if (data) {
         const {locations} = data as {
             locations: Location.LocationObject[]
@@ -37,7 +33,7 @@ TaskManager.defineTask(LOCATION_TASK, async ({data, error}) => {
                 body: JSON.stringify({childId, time, lng, lat, speed})
             })
 
-            if (res.ok) console.log("location sent successfully");
+            if (!res.ok) console.log("location not sent");
         } catch (error) {
             console.log(error);
         }

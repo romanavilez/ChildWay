@@ -53,7 +53,6 @@ export default function children() {
             
             // Append new child and location or update location
             const handleLocationUpdate = (data:LocationUpdateProps) => {
-                console.log("handle location update:", data);
                 setChildLocations(prev => ({
                     ...prev,
                     [data.childId] : {lng:data.lng, lat:data.lat, speed:data.speed}
@@ -92,7 +91,9 @@ export default function children() {
                             <ChildCard
                                 name={item}
                                 distance={parentLocation && location ? haversine(parentLocation.lat, parentLocation.lng, location.lat, location.lng) : "0"}
-                                status={location ? `${(location?.speed * 2.2369363).toFixed(2)} mph` : 'N/A'}
+                                speed={
+                                    location ? location?.speed <= 0.25 ? "0 mph" : `${(location?.speed * 2.2369363).toFixed(2)} mph` : 'N/A'
+                                }
                                 longitude={location?.lng || null}
                                 latitude={location?.lat || null}
                                 setScroll={setScrollEnabled}

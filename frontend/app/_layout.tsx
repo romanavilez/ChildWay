@@ -45,8 +45,6 @@ export default function RootLayout() {
   useEffect(() => {
     // only send location if user is logged in and is a child
     const handleTracking = async () => {
-      console.log("uername:", user);
-      console.log("userType:", userType);
       if (user && userType === 'child') await startLocationTracking();
       else if (!user) await stopLocationTracking();
     }

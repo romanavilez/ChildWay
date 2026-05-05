@@ -5,13 +5,13 @@ import { MapView, Camera, MarkerView, Images } from '@rnmapbox/maps'
 type ChildCardProps = {
     name: string
     distance: string | null
-    status: string
+    speed: string
     longitude: number | null
     latitude: number | null
     setScroll: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function ChildCard({name, distance, status, longitude, latitude, setScroll} : ChildCardProps) {
+export default function ChildCard({name, distance, speed, longitude, latitude, setScroll} : ChildCardProps) {
     return (
         <View className='w-full rounded-2xl p-3 bg-slate-800 mb-4'>
             {/* Child Info */}
@@ -19,7 +19,7 @@ export default function ChildCard({name, distance, status, longitude, latitude, 
                 <Text className='text-2xl color-white font-staatliches'>{name}</Text>
                 <Text className='color-slate-300 font-staatliches'>Distance: {distance} mi</Text>
             </View>
-            <Text className='color-primary-two font-staatliches'>Status: {status}</Text>
+            <Text className='color-primary-two font-staatliches'>Speed: {speed}</Text>
             {/* Map */}
             <View className='h-52 rounded-2xl overflow-hidden'>
                 <MapView style={{flex: 1}} onTouchStart={() => setScroll(false)} onTouchEnd={() => setScroll(true)}>
@@ -39,7 +39,7 @@ export default function ChildCard({name, distance, status, longitude, latitude, 
                 </MapView>  
             </View>
             {/* Alerts */}
-            <View className='h-36 rounded-2xl mt-2'>
+            <View className='h-32 rounded-2xl mt-2'>
                 <Text className='text-xl color-tertiary font-staatliches'>Alerts</Text>
                 <ScrollView persistentScrollbar={true} nestedScrollEnabled={true}>
                     <Text className='font-oswald-extralight color-white'>3:40 PM - Unusual route detected</Text>

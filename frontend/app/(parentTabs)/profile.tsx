@@ -80,14 +80,6 @@ export default function profile() {
     }
 
     const sendNotification = async () => {
-        // await Notifications.scheduleNotificationAsync({
-        //     content: {
-        //         title: "Testing notification",
-        //         body: "Here is the notification body",
-        //         data: {type: "test"}
-        //     },
-        //     trigger: null
-        // })
         try {
             const title = "Test Message";
             const body = "This message is being sent to ravilez";

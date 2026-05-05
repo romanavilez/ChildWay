@@ -4,7 +4,7 @@ import { MapView, Camera, MarkerView, Images } from '@rnmapbox/maps'
 
 type ChildCardProps = {
     name: string
-    distance: number
+    distance: string | null
     status: string
     longitude: number | null
     latitude: number | null

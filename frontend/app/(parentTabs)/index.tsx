@@ -12,11 +12,13 @@ export default function index() {
     type ChildLocation = {
         lat: number
         lng: number
+        speed: number
     }
     type LocationUpdateProps = {
         childId: string
-        latitude: number
-        longitude: number
+        lat: number
+        lng: number
+        speed: number
     }
 
     // Use states
@@ -29,35 +31,19 @@ export default function index() {
             // Grab socket
             const socket = getSocket();
             if (!socket) return;
-            // On connection, join each child's room
-            const handleConnect = () => {
-                console.log("Socket id:", socket.id);
-                for (const child of children) {
-                    console.log("joining child:", child)
-                    socket.emit("join_child", child);
-                    socket.emit("start_sending_location", child);
-                }
-            }
-            // handle connection when socket connects
-            if (socket.connected) handleConnect();
-            else socket.once("connect", handleConnect);
+            
             // Append new child and location or update location
             const handleLocationUpdate = (data:LocationUpdateProps) => {
-                console.log("handle location update");
+                console.log("handle location update:", data);
                 setChildLocations(prev => ({
                     ...prev,
-                    [data.childId] : {lng:data.longitude, lat:data.latitude}
+                    [data.childId] : {lng:data.lng, lat:data.lat, speed:data.speed}
                 }));
             }
             socket.on("location_update", handleLocationUpdate);
 
             // leave all rooms and turn off existing sockets
             return () => {
-                for (const child of children) {
-                    socket.emit("stop_sending_location", child);
-                    console.log("leaving child:", child);
-                    socket.emit("leave_child", child);
-                }
                 socket.off("location_update", handleLocationUpdate);
             }
         }, [children])

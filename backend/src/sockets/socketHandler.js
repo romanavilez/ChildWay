@@ -30,11 +30,6 @@ export const initSockets = (io) => {
             // child joins its own room
             socket.join(`child:${userId}`);
             console.log({userId}, ":", socket.rooms);
-            // receive location
-            socket.on("location_update", (data) => {
-                console.log("location update");
-                socket.to(`child:${data.childId}`).emit("location_update", (data));
-            })
         } else if (socket.role === "parent") {
             // verify that user is child's parent and join room
             socket.on("join_child", (childId) => {
@@ -44,14 +39,6 @@ export const initSockets = (io) => {
                     socket.join(`child:${childId}`);
                     console.log({userId}, ":", socket.rooms);
                 });
-            });
-            // send location data
-            socket.on("start_sending_location", (childId) => {
-                socket.to(`child:${childId}`).emit("start_sending_location");
-            });
-            // stop sending location data
-            socket.on("stop_sending_location", (childId) => {
-                socket.to(`child:${childId}`).emit("stop_sending_location");
             });
         } 
         // Leave child's room

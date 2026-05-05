@@ -23,6 +23,15 @@ app.use(express.json());
 // Enable Cross-Origin Resource Sharing
 app.use(cors());
 
+// Create http server
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+    cors: { origin: "*" }
+});
+
+// make io accessible everywhere
+app.set("io", io);
+
 // Set up routes
 app.use("/api/alerts", alertRoutes);
 app.use("/api/commutes", commuteRoutes);
@@ -32,12 +41,6 @@ app.use("/api/users", userRoutes);
 app.use("/api/linkTokens", linkTokenRoutes);
 app.use("/api/parentChildren", parentChildRoutes);
 app.use("/api/pushTokens", pushTokenRoutes);
-
-// Create http server
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-    cors: { origin: "*" }
-});
 
 // Socket logic
 initSockets(io);

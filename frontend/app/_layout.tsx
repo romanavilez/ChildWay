@@ -2,14 +2,16 @@ import { SplashScreen, Stack } from "expo-router";
 
 import './global.css'
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { StatusBar } from "react-native";
 import {useFonts} from 'expo-font'
 import { useEffect } from "react";
-import { requestForegroundPermissionsAsync } from "expo-location";
 
 import { useAuthStore } from "@/store/auth.store";
 import { connectSocket, disconnectSocket } from "@/services/socket";
 import { useNotifications } from "@/hooks/useNotifications";
+
+import "../services/locationService"
+import * as Location from 'expo-location'
+import { LOCATION_TASK, startLocationTracking, stopLocationTracking } from "@/services/locationService";
 
 export default function RootLayout() {
   // Set up fonts
@@ -29,24 +31,28 @@ export default function RootLayout() {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded, error]);
 
-  // Ask user for location permission
-  useEffect(() => {
-      (async () => {
-          const {status} = await requestForegroundPermissionsAsync();
-          if (status !== 'granted') {
-              console.log('Location Permission Denied!');
-          }
-      })();
-  }, []);
-
+  
   // Socket connection
   const user = useAuthStore((state) => state.username);
   const userType = useAuthStore((state) => state.userType);
   useEffect(() => {
     if (!user || !userType) return;
     connectSocket(user, userType);
-    return () => disconnectSocket();
+    return () => disconnectSocket(userType, user);
   }, [user])
+
+  // Continuosly send location data
+  useEffect(() => {
+    // only send location if user is logged in and is a child
+    const handleTracking = async () => {
+      console.log("uername:", user);
+      console.log("userType:", userType);
+      if (user && userType === 'child') await startLocationTracking();
+      else if (!user) await stopLocationTracking();
+    }
+
+    handleTracking();
+  }, [user, userType])
 
   useNotifications(user);
   

@@ -1,19 +1,67 @@
 import {io, Socket} from 'socket.io-client'
-import { getCurrentPositionAsync } from 'expo-location';
-import { use } from 'react';
-
 
 let socket : Socket | null = null;
-let interval : ReturnType<typeof setInterval> | null = null;
 
-export const connectSocket = (userId:String, userType:String) => {
+// On connection, join each child's room
+const joinChildren = (children: string[]) => {
+    console.log("Socket id:", socket?.id);
+    for (const child of children) {
+        console.log("joining child:", child)
+        socket?.emit("join_child", child);
+    }
+}
+
+const handleConnect = async (userId: String, socket: Socket) => {
+    try {
+        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/parentChildren/get-all-children/${userId}`, {
+            method: "GET",
+            headers: {"Content-Type" : "applicaton/json"}
+        })
+
+        const data = await res.json();
+
+        if (res.ok) {
+            // handle connection when socket connects
+            const children = data.res;
+            if (socket.connected) joinChildren(children.map((child:any) => child.child_id));
+            else socket.once("connect", () => joinChildren(children.map((child:any) => child.child_id)));
+        }
+
+    } catch (error) {
+        console.log("Error getting children:", error);
+    }
+}
+
+const leaveAllChildren = async (userId:string) => {
+    try {
+        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/parentChildren/get-all-children/${userId}`, {
+            method: "GET",
+            headers: {"Content-Type" : "applicaton/json"}
+        })
+        
+        const data = await res.json();
+
+        if (res.ok) {
+            const children = data.res;
+            if (socket?.connected) {
+                for (const child of children) {
+                    socket.emit("leave_child", child);
+                }
+            }
+        }
+    } catch (error) {
+        console.log("Error leaving children:", error);
+    }
+}
+
+export const connectSocket = (userId:string, userType:string) => {
     // If socket exists, disconnect
     if (socket) {
         socket.disconnect();
         socket = null;
     }
     // Connect to socket on server
-    socket = io("http://10.0.0.99:5001", {
+    socket = io(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001`, {
         auth: {userId, userType}
     });
     // verify connection
@@ -21,47 +69,16 @@ export const connectSocket = (userId:String, userType:String) => {
         console.log("CONNECTION IN FRONT END:", socket?.id);
     })
 
-    // Get user's coordinates
-    const getLocation = async () => {
-        let loc = await getCurrentPositionAsync({});
-        console.log("getLocation:", loc.coords);
-        return loc.coords;
-    }
-
-    if (userType === "child") {
-        // Handle sending location
-        socket.on("start_sending_location", () => {
-            console.log("start sending location");
-            // interval is already set
-            if (interval) return;
-            // Send location every 5 seconds
-            const sendLocation = async () => {
-                let location = await getLocation();
-                socket?.emit("location_update", ({
-                    childId: userId,
-                    latitude: location.latitude,
-                    longitude: location.longitude
-                }))
-            }
-            sendLocation();
-            interval = setInterval(sendLocation, 5000);
-        });
-        // Stop sendling location
-        socket.on("stop_sending_location", () => {
-            console.log("stop sending location");
-            if (interval) {
-                // clear interval
-                clearInterval(interval);
-                interval = null;
-            }
-        });
+    if (userType === 'parent') {
+        handleConnect(userId, socket);
     }
 
     return socket;
 }
 
-export const disconnectSocket = () => {
+export const disconnectSocket = (userType: string, userId: string) => {
     if (socket) { 
+        if (userType === 'parent') leaveAllChildren(userId);
         console.log("disconnect socket:", socket.id);
         socket.disconnect();
         socket = null;

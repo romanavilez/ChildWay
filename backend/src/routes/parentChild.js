@@ -20,4 +20,17 @@ router.post("/pair-child", (req, res) => {
     );
 })
 
+router.get("/get-all-children/:parentId", (req, res) => {
+    const {parentId} = req.params;
+
+    db.query(
+        "SELECT child_id FROM parent_child WHERE parent_id = ?",
+        [parentId],
+        (err, results=[]) => {
+            if (err) res.status(500).json({error: err});
+            return res.status(200).json({res: results});
+        }
+    )
+})
+
 export default router;

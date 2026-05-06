@@ -132,5 +132,48 @@ export const createTables = async () => {
     db.query(pushToken, (err) => {
         if (err) throw err;
         console.log("Push token table created!");
-    })
+    });
+
+    // Conversation table creation
+    const conversation = `
+        CREATE TABLE IF NOT EXISTS conversation (
+            conversation_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+            type ENUM('direct', 'group')
+        );
+    `
+    db.query(conversation, (err) => {
+        if (err) throw err;
+        console.log("Conversation table created!");
+    });
+
+    // Conversation_participants table creation
+    const conversation_participant = `
+        CREATE TABLE IF NOT EXISTS conversation_participant (
+            conversation_id BIGINT NOT NULL,
+            user_id VARCHAR(255) NOT NULL,
+            PRIMARY KEY (conversation_id, user_id),
+            FOREIGN KEY (conversation_id) REFERENCES conversation(conversation_id),
+            FOREIGN KEY (user_id) REFERENCES user (username)
+        );
+    `
+    db.query(conversation_participant, (err) => {
+        if (err) throw err;
+        console.log("conversation_participants table created!");
+    });
+
+    const message = `
+        CREATE TABLE IF NOT EXISTS message (
+            message_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+            conversation_id BIGINT NOT NULL,
+            sender_id VARCHAR(255) NOT NULL,
+            message_text TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (conversation_id) REFERENCES conversation (conversation_id),
+            FOREIGN KEY (sender_id) REFERENCES user (username)
+        );  
+    `
+    db.query(message, (err) => {
+        if (err) throw err;
+        console.log('Message table created!');
+    });
 };

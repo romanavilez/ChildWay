@@ -33,4 +33,17 @@ router.get("/get-all-children/:parentId", (req, res) => {
     )
 })
 
+router.get("/get-all-parents/:childId", (req, res) => {
+    const {childId} = req.params;
+
+    db.query(
+        "SELECT parent_id FROM parent_child WHERE child_id = ?", 
+        [childId],
+        (err, results=[]) => {
+            if (err) return res.status(500).json({error: err});
+            return res.status(200).json({parents: results});
+        }
+    );
+})
+
 export default router;

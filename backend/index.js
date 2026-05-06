@@ -12,6 +12,8 @@ import userRoutes from "./src/routes/users.js";
 import linkTokenRoutes from "./src/routes/linkTokens.js";
 import parentChildRoutes from "./src/routes/parentChild.js";
 import pushTokenRoutes from "./src/routes/pushTokens.js";
+import conversationRoutes from "./src/routes/conversations.js"
+import messageRoutes from "./src/routes/messages.js";
 
 import { initSockets } from "./src/sockets/socketHandler.js";
 
@@ -41,6 +43,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/linkTokens", linkTokenRoutes);
 app.use("/api/parentChildren", parentChildRoutes);
 app.use("/api/pushTokens", pushTokenRoutes);
+app.use("/api/conversations", conversationRoutes);
+app.use("/api/messages", messageRoutes);
 
 // Socket logic
 initSockets(io);

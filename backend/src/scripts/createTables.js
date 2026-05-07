@@ -69,34 +69,15 @@ export const createTables = async () => {
         console.log("safe_zone table created!");
     })
 
-    // Commute table creation
-    const commute = `
-        CREATE TABLE IF NOT EXISTS commute (
-            child_id VARCHAR(255) NOT NULL,
-            start_loc_name VARCHAR(50) NOT NULL,
-            end_loc_name VARCHAR(50) NOT NULL,
-            start_time TIMESTAMP NOT NULL,
-            end_time TIMESTAMP NOT NULL,
-            route_data JSON,
-            PRIMARY KEY (child_id, start_loc_name, end_loc_name),
-            FOREIGN KEY (child_id) REFERENCES user(username),
-            FOREIGN KEY (child_id, start_loc_name) REFERENCES location(child_id, loc_name),
-            FOREIGN KEY (child_id, end_loc_name) REFERENCES location(child_id, loc_name)
-        );
-    `;
-    db.query(commute, (err) => {
-        if (err) throw err;
-        console.log("commute table created!");
-    });
-
     // Location table creation
     const location = `
         CREATE TABLE IF NOT EXISTS location (
+            location_id BIGINT AUTO_INCREMENT PRIMARY KEY,
             child_id VARCHAR(255) NOT NULL,
-            loc_name VARCHAR(50) NOT NULL,
             longitude DECIMAL(9,6) NOT NULL,
             latitude DECIMAL(9,6) NOT NULL,
-            PRIMARY KEY (child_id, loc_name),
+            speed DOUBLE NOT NULL,
+            time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (child_id) REFERENCES user(username)
         );
     `;

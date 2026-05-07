@@ -5,9 +5,7 @@ import { createServer } from "http";
 import { ConnectDB } from "./src/lib/db.js";
 
 import alertRoutes from "./src/routes/alerts.js";
-import commuteRoutes from "./src/routes/commutes.js";
 import locationRoutes from "./src/routes/locations.js";
-import safeZoneRoutes from "./src/routes/safeZones.js";
 import userRoutes from "./src/routes/users.js";
 import linkTokenRoutes from "./src/routes/linkTokens.js";
 import parentChildRoutes from "./src/routes/parentChild.js";
@@ -36,9 +34,7 @@ app.set("io", io);
 
 // Set up routes
 app.use("/api/alerts", alertRoutes);
-app.use("/api/commutes", commuteRoutes);
 app.use("/api/locations", locationRoutes);
-app.use("/api/safeZones", safeZoneRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/linkTokens", linkTokenRoutes);
 app.use("/api/parentChildren", parentChildRoutes);

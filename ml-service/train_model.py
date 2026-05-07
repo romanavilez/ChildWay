@@ -12,7 +12,6 @@ X = data[
         "longitude",
         "latitude",
         "speed",
-        "distance_from_home",
         "time",
         "day_of_week"
     ]

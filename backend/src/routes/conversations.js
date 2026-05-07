@@ -21,11 +21,16 @@ router.get("/get-all-conversations/:userId", (req, res) => {
     const {userId} = req.params;
 
     db.query(
-        "SELECT conversation_id FROM conversation_participant WHERE user_id = ?",
-        [userId],
+        `
+        SELECT c.conversation_id, cp2.user_id FROM conversation c
+        JOIN conversation_participant cp1 ON c.conversation_id = cp1.conversation_id
+        JOIN conversation_participant cp2 ON c.conversation_id = cp2.conversation_id
+        WHERE cp1.user_id = ? AND cp2.user_id != ? AND c.type = 'direct'
+        `,
+        [userId, userId],
         (err, results=[]) => {
             if (err) return res.status(500).json({error: err});
-            return res.status(200).json({conversationIds: results});
+            return res.status(200).json({conversations: results});
         }
     );
 })

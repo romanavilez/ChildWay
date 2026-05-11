@@ -41,9 +41,25 @@ export const initSockets = (io) => {
                 });
             });
         } 
+
+        // Open message room
+        socket.on("open_message", (currentConversation) => {
+            socket.join(`message:${currentConversation}`);
+        })
+
+        // Send message
+        socket.on("send_message", (data) => {
+            socket.to(`message:${data.conversationId}`).emit("receive_message", data);
+        })
+
+        // Close message room
+        socket.on("close_message", (currentConversation) => {
+            socket.leave(`message:${currentConversation}`);
+        })
+
         // Leave child's room
-        socket.on("leave_child", (childId) => {
-            socket.leave(`child:${childId}`);
+        socket.on("leave_child", (currentConversation) => {
+            socket.leave(`child:${currentConversation}`);
         })
 
     });

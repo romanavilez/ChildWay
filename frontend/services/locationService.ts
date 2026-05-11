@@ -33,7 +33,9 @@ TaskManager.defineTask(LOCATION_TASK, async ({data, error}) => {
                 body: JSON.stringify({childId, time, lng, lat, speed})
             })
 
-            if (!res.ok) console.log("location not sent");
+            const data = await res.json();
+
+            if (!res.ok) console.log("location not sent:", data.error);
         } catch (error) {
             console.log(error);
         }

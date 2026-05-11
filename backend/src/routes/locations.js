@@ -14,7 +14,7 @@ router.post("/send-location", (req, res) => {
     try {
         // Verify all fields are valid
         const {childId, time, lng, lat, speed} = req.body;
-        if (!childId || !time || !lng || !lat || !speed) {
+        if (childId === null || time === null || lng === null || lat === null || speed === null) {
             return res.status(400).json({error: "Missing required location fields"});
         }
         // Send child location to parents

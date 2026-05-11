@@ -176,7 +176,7 @@ const Index = () => {
                             textAlign='center'
                             value={search}
                             onChangeText={(text) => setSearch(text)}
-                            onFocus={() => {getLocation; setSearchFocus(true)}}
+                            onFocus={() => {getLocation(); setSearchFocus(true)}}
                             onSubmitEditing={(event) => {
                                 const query = event.nativeEvent.text;
                                 if (location) {

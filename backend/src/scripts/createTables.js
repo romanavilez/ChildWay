@@ -119,7 +119,9 @@ export const createTables = async () => {
     const conversation = `
         CREATE TABLE IF NOT EXISTS conversation (
             conversation_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-            type ENUM('direct', 'group')
+            type ENUM('direct', 'group') NOT NULL,
+            last_message TEXT,
+            message_time TIMESTAMP
         );
     `
     db.query(conversation, (err) => {

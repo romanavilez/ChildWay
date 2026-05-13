@@ -42,6 +42,16 @@ export const initSockets = (io) => {
             });
         } 
 
+        // Open own room
+        socket.on("open_self", () => {
+            socket.join(`user:${userId}`);
+        })
+
+        // Close own room
+        socket.on("close_self", () => {
+            socket.leave(`user:${userId}`);
+        })
+
         // Open message room
         socket.on("open_message", (currentConversation) => {
             socket.join(`message:${currentConversation}`);
@@ -50,6 +60,7 @@ export const initSockets = (io) => {
         // Send message
         socket.on("send_message", (data) => {
             socket.to(`message:${data.conversationId}`).emit("receive_message", data);
+            socket.to(`user:${data.conversationPartner}`).emit("conversation_update", data);
         })
 
         // Close message room

@@ -38,20 +38,4 @@ router.get("/get-all-messages/:conversationId", (req, res) => {
     )
 });
 
-router.get("/get-last-message/:conversationId", (req, res) => {
-    const {conversationId} = req.params;
-
-    db.query(
-        "SELECT message_text, created_at FROM message WHERE conversation_id = ? ORDER BY created_at DESC LIMIT 1",
-        [conversationId],
-        (err, results=[]) => {
-            if (err) return res.status(500).json({error: err});
-            if (results.length === 0) return res.status(200).json({message: null, timestamp: null});
-
-            const latestMessage = results[0];
-            return res.status(200).json({message: latestMessage.message_text, timestamp: latestMessage.created_at});
-        }
-    );
-})
-
 export default router;

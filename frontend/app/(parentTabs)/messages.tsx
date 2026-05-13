@@ -21,18 +21,23 @@ export default function messages() {
         setMessageText,
         openConversations,
         setOpenConversations,
-        lastMessages, 
-        setLastMessages,
         contacts,
         setContacts,
         currentConversation,
         setCurrentConversation,
         keyboardVisible,
         setKeyboardVisible,
+        chatOpen,
+        setChatOpen,
+        conversationPartner,
+        setConversationPartner,
+        newChatOpen,
+        setNewChatOpen,
         getCurrentTime,
+        zeroUnreadMessages,
         handleSendMessage,
+        handleNewChat,
         getAllMessages, 
-        getLastMessage,
         getAllConversations
     } = useMessages();
 
@@ -61,22 +66,29 @@ export default function messages() {
         <MessagesScreen 
             socket={socket}
             openConversations={openConversations}
-            lastMessages={lastMessages}
             currentConversation={currentConversation}
             keyboardVisible={keyboardVisible}
             messageList={messageList}
             messageText={messageText}
             contacts={contacts}
+            chatOpen={chatOpen}
+            conversationPartner={conversationPartner}
+            newChatOpen={newChatOpen}
+            setNewChatOpen={setNewChatOpen}
             userId={userId}
             color={'#FF6F52'}
             setMessageText={setMessageText}
             setCurrentConversation={setCurrentConversation}
             setMessageList={setMessageList}
             setContacts={setContacts}
+            setChatOpen={setChatOpen}
+            setConversationPartner={setConversationPartner}
+            zeroUnreadMessages={zeroUnreadMessages}
+            handleSendMessage={handleSendMessage}
+            handleNewChat={handleNewChat}
             getAllContacts={getAllContacts}
             getAllMessages={getAllMessages}
             getCurrentTime={getCurrentTime}
-            handleSendMessage={handleSendMessage}
         />
     )
 }

@@ -134,6 +134,7 @@ export const createTables = async () => {
         CREATE TABLE IF NOT EXISTS conversation_participant (
             conversation_id BIGINT NOT NULL,
             user_id VARCHAR(255) NOT NULL,
+            unread_messages BIGINT,
             PRIMARY KEY (conversation_id, user_id),
             FOREIGN KEY (conversation_id) REFERENCES conversation(conversation_id),
             FOREIGN KEY (user_id) REFERENCES user (username)

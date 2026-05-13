@@ -8,13 +8,10 @@ export const useMessages = () => {
     const socket = getSocket();
     // types
     type conversationProps = {
-        conversation_id: number,
+        last_message: string,
+        message_time: string,
+        unread_messages: number,
         user_id: string
-    }
-
-    type lastMessagesProps = {
-        message: string,
-        time: string
     }
 
     type contactProps = {
@@ -29,11 +26,14 @@ export const useMessages = () => {
         created_at: string
     }[]>([]);
     const [messageText, setMessageText] = useState("");
-    const [openConversations, setOpenConversations] = useState<conversationProps[] | []>([]);
-    const [lastMessages, setLastMessages] = useState<Map<number, lastMessagesProps>>(new Map());
+    const [openConversations, setOpenConversations] = useState<Map<number, conversationProps>>(new Map());
     const [contacts, setContacts] = useState<contactProps[] | []>([]);
     const [currentConversation, setCurrentConversation] = useState<number | null>(null);
     const [keyboardVisible, setKeyboardVisible] = useState(false); 
+    const [chatOpen, setChatOpen] = useState(false);
+    const [conversationPartner, setConversationPartner] = useState<string | null>(null);
+    const [newChatOpen, setNewChatOpen] = useState(false);
+    const [unreadMessages, setUnreadMessages] = useState(0);
 
     // Auth states
     const userId = useAuthStore((state) => state.username);
@@ -48,8 +48,90 @@ export const useMessages = () => {
         return time;
     }
 
+    // Update last message and time
+    const updateLastMessage = async (message: string, conversationId: number) => {
+        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/conversations/update-last-message`, {
+            method: "POST",
+            headers: {"Content-Type" : "application/json"},
+            body: JSON.stringify({message, conversationId})
+        })
+
+        const data = await res.json();
+
+        if (res.ok) {
+            // Update open conversations to show on UI
+            setOpenConversations((prev) => {
+                // Create map from sorted array
+                let updated = new Map(prev);
+                // Check that conversation exists
+                const conversation = updated.get(conversationId);
+                if (!conversation) return prev;
+                // Update map entry with new message and time
+                updated.set(conversationId, {
+                    ...conversation,
+                    last_message: message,
+                    message_time: new Date().toISOString()
+                });
+                // Re order conversations to have latest at top
+                const sorted = Array.from(updated.entries()).sort(
+                    (a,b) => 
+                        new Date(b[1].message_time).getTime() -
+                        new Date(a[1].message_time).getTime()
+                )
+
+                return new Map(sorted);
+            })
+        } else  {
+            console.log("Error updating last message", data.error);
+        }
+    }
+
+    // Set unread messages to zero
+    const zeroUnreadMessages = async (conversationId: number, userId: string) => {
+        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/conversations/zero-unread-messages`, {
+            method: "POST",
+            headers: {"Content-Type" : "application/json"},
+            body: JSON.stringify({conversationId, userId})
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            setOpenConversations((prev) => {
+                let updated = new Map(prev);
+
+                const conversation = updated.get(conversationId);
+                if (!conversation) return updated;
+
+                updated.set(conversationId, {
+                    ...conversation,
+                    unread_messages: 0
+                });
+
+                return updated;
+            })
+        } else {
+            console.log("Error zeroing unread count:", data.error);
+        }
+    }
+
+    // Increase unread messages by one
+    const increaseUnreadMessages = async (conversationId: number, userId: string) => {
+        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/conversations/increase-unread-messages`, {
+            method: "POST",
+            headers: {"Content-Type" : "application/json"},
+            body: JSON.stringify({conversationId, userId})
+        })
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            console.log("Error increasing unread count:", data.error);
+        }
+    }
+
     // Logic when sending a message
-    const handleSendMessage = async (conversationId: number, sender: string, text: string) => {
+    const handleSendMessage = async (conversationId: number, sender: string, conversationPartner: string, text: string) => {
         let createdAt: string = "";
         // store message in database
         try {
@@ -75,11 +157,16 @@ export const useMessages = () => {
         const message = {"conversation_id": conversationId, "sender_id": sender, "message_text": text, "created_at": createdAt};
         setMessageList((prev) => [...prev, message]);
         setMessageText("");
+        // Update last message
+        updateLastMessage(text, conversationId);
+        // Update unread messages
+        increaseUnreadMessages(conversationId, conversationPartner);
         // Send message through socket
         if (socket) {
-            socket.emit("send_message", {conversationId, sender, text, createdAt});
+            socket.emit("send_message", {conversationId, sender, conversationPartner, text, createdAt});
         }
     }
+
 
     // Get all messages for a specific convervsation
     const getAllMessages = async (conversation_id: number) => {
@@ -95,25 +182,6 @@ export const useMessages = () => {
         }
     }
 
-    // Get last message for all conversations
-    const getLastMessage = async (conversationId: number) => {
-        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/messages/get-last-message/${conversationId}`, {
-            method: "GET",
-            headers: {"Content-Type" : "application/json"}
-        });
-
-        const data = await res.json();
-
-        if (res.ok && data.message) {
-            const lastMessage = {message: data.message, time: data.timestamp }
-            setLastMessages((prev) => {
-                const newMap = new Map(prev);
-                newMap.set(conversationId, lastMessage);
-                return newMap;
-            });
-        }
-    }
-
     // Get all conversations for this specific user
     const getAllConversations = async () => {
         const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/conversations/get-all-conversations/${userId}`, {
@@ -123,13 +191,81 @@ export const useMessages = () => {
 
         const data = await res.json();
 
-        if (res.ok) setOpenConversations(data.conversations);
+        if (res.ok) {
+            setOpenConversations(new Map(
+                data.conversations.map((conversation: {conversation_id: number, last_message: string, message_time: string, unread_messages: number, user_id: string}) => [
+                    conversation.conversation_id, {
+                        last_message: conversation.last_message,
+                        message_time: conversation.message_time,
+                        unread_messages: conversation.unread_messages,
+                        user_id: conversation.user_id
+                    }
+                ])
+            ));
+        }
     } 
+
+    // Add a conversation participant to database
+    const addParticipant = async (conversationId: number, userId: string | null) => {
+        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/conversations/add-participant`, {
+            method: "POST",
+            headers: {"Content-Type" : "application/json"},
+            body: JSON.stringify({conversationId, userId})
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            console.log("Successfully added", userId, "to conversation", conversationId);
+        } else {
+            console.log("Error adding conversation participant:", data.error);
+        }
+    }
+
+    // handles a new conversation being opened
+    const handleNewChat = async (conversationPartner: string) => {
+        // Attempt to create conversation
+        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/conversations/create-conversation`, {
+            method: "POST",
+            headers: {"Content-Type" : "application/json"},
+            body: JSON.stringify({type: 'direct', cp1: userId, cp2: conversationPartner})
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            const conversationId = data.conversationId;
+            setCurrentConversation(conversationId);
+            setConversationPartner(conversationPartner);
+            if (data.success) {
+                // conversation doesn't already exist
+                addParticipant(conversationId, userId);
+                addParticipant(conversationId, conversationPartner);
+                const newConversation: conversationProps = {last_message:"", message_time:"", unread_messages: 0, user_id: conversationPartner};
+                setOpenConversations((prev) => {
+                    let updated = new Map(prev);
+
+                    updated.set(conversationId, newConversation);
+                    
+                    return updated;
+                })
+            } else {
+                // conversation already exists
+                console.log("Conversation already created");
+            }
+            setNewChatOpen(false);
+            getAllMessages(conversationId);
+            setChatOpen(true);
+        } else {
+            console.log("Error adding new chat:", data.error);
+        }
+    }
 
     // Handle opening conversation
     useEffect(() => {
         if (!currentConversation) return;
         if (!socket) return;
+
         // Join room with message:currentConversation as the room
         socket.emit("open_message", currentConversation);
         // Update message list on receive_message
@@ -141,29 +277,58 @@ export const useMessages = () => {
 
         return () => {socket.off("receive_message", messageHandler)};
 
-    }, [currentConversation]) 
+    }, [currentConversation]) ;
 
     // On page render
     useFocusEffect(
         useCallback(() => {
             getAllConversations();
-        }, [])
-    );
+            if (!socket) {
+                console.log("no socket");
+                return;
+            }
+            // Open own room to get live updates
+            socket.emit("open_self");
 
-    useEffect(() => {
-        if (openConversations.length > 0) {
-            openConversations.forEach((conversation) => {
-                getLastMessage(conversation.conversation_id);
-            });
-        }
-    }, [openConversations, messageList])
+            const conversationHandler = (data: {conversationId: number, text: string, createdAt: string}) => {
+                setOpenConversations((prev) => {
+                    let updated = new Map(prev);
+                    // Check that conversation exists
+                    const conversation = updated.get(data.conversationId);
+                    if (!conversation) return updated;
+                    // Update conversation
+                    updated.set(data.conversationId, {
+                        ...conversation,
+                        last_message: data.text,
+                        message_time: data.createdAt,
+                        unread_messages: (conversation.unread_messages ?? 0) + 1
+                    });
+                    // Sort conversations to have latest  at top
+                    const sorted = Array.from(updated.entries()).sort(
+                        (a,b) => 
+                            new Date(b[1].message_time).getTime() -
+                            new Date(a[1].message_time).getTime()
+                    )
+
+                    return new Map(sorted);
+                });
+            }
+
+            socket.on("conversation_update", conversationHandler);
+
+            return () => {
+                socket.off("conversation_update", conversationHandler);
+                socket.emit("close_self");
+            };
+        }, [socket])
+    );
 
     useEffect(() => {
         const onShow = Keyboard.addListener('keyboardDidShow', () => {setKeyboardVisible(true)});
         const onHide = Keyboard.addListener('keyboardDidHide', () => {setKeyboardVisible(false)});
 
         return () => {onShow.remove(); onHide.remove()}
-    }, [])
+    }, []);
 
     return {
         messageList,
@@ -172,18 +337,25 @@ export const useMessages = () => {
         setMessageText,
         openConversations,
         setOpenConversations,
-        lastMessages, 
-        setLastMessages,
         contacts,
         setContacts,
         currentConversation,
         setCurrentConversation,
         keyboardVisible,
         setKeyboardVisible,
-        getCurrentTime,
+        chatOpen,
+        setChatOpen,
+        conversationPartner, 
+        setConversationPartner,
+        newChatOpen,
+        setNewChatOpen,
+        unreadMessages, 
+        setUnreadMessages,
+        zeroUnreadMessages,
         handleSendMessage,
+        handleNewChat,
+        getCurrentTime,
         getAllMessages, 
-        getLastMessage,
-        getAllConversations
+        getAllConversations,
     };
 }

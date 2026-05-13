@@ -7,13 +7,10 @@ import { Socket } from "socket.io-client";
 
 // types
 type conversationProps = {
-    conversation_id: number,
+    last_message: string,
+    message_time: string,
+    unread_messages: number,
     user_id: string
-};
-
-type lastMessagesProps = {
-    message: string,
-    time: string
 };
 
 type messageProps = {
@@ -29,48 +26,59 @@ type contactProps = {
 
 type MessageScreenProps = {
     socket: Socket | null,
-    openConversations: conversationProps[],
-    lastMessages: Map<number, lastMessagesProps>,
+    openConversations: Map<number, conversationProps>,
     currentConversation: number | null,
     keyboardVisible: boolean,
     messageList: messageProps[] | [],
     messageText: string,
     contacts: contactProps[] | [],
+    chatOpen: boolean,
+    conversationPartner: string | null,
+    newChatOpen: boolean,
     userId: string | null,
     color: string,
     setMessageText: React.Dispatch<React.SetStateAction<string>>,
     setCurrentConversation: React.Dispatch<React.SetStateAction<number | null>>,
     setMessageList: React.Dispatch<React.SetStateAction<messageProps[] | []>>,
     setContacts: React.Dispatch<React.SetStateAction<contactProps[] | []>>,
+    setChatOpen: React.Dispatch<React.SetStateAction<boolean>>,
+    setConversationPartner: React.Dispatch<React.SetStateAction<string | null>>,
+    setNewChatOpen: React.Dispatch<React.SetStateAction<boolean>>,
+    zeroUnreadMessages: (conversationId: number, userId: string) => void,
+    handleSendMessage: (conversationId: number, sender: string, conversationPartner: string, text: string) => void
+    handleNewChat: (conversationPartner: string) => void
     getAllContacts: () => void,
     getAllMessages: (conversation_id: number) => void,
     getCurrentTime: (timestamp: string) => string,
-    handleSendMessage: (conversationId: number, sender: string, text: string) => void
 };
 
 const MessagesScreen = ({
     socket,
     openConversations, 
-    lastMessages, 
     currentConversation,
     keyboardVisible,
     messageList,
     messageText,
     contacts,
+    chatOpen,
+    conversationPartner,
+    newChatOpen,
     userId,
     color,
     setMessageText,
     setCurrentConversation, 
     setMessageList,
     setContacts,
+    setChatOpen,
+    setConversationPartner,
+    setNewChatOpen,
+    zeroUnreadMessages,
+    handleSendMessage,
+    handleNewChat,
     getAllContacts,
     getAllMessages,
     getCurrentTime,
-    handleSendMessage
 } : MessageScreenProps) => {
-    const [chatOpen, setChatOpen] = useState(false);
-    const [conversationPartner, setConversationPartner] = useState<string | null>(null);
-    const [newChatOpen, setNewChatOpen] = useState(false);
 
     useEffect(() => {
         getAllContacts();
@@ -80,27 +88,43 @@ const MessagesScreen = ({
         <View className='flex-1 bg-secondary'> 
             {/* Conversation list */}
             <View className='relative flex-1'>
-                {openConversations.length > 0 ? (
+                {openConversations.size > 0 ? (
                     <FlatList
-                        data={openConversations}
-                        keyExtractor={(item) => item.conversation_id.toString()}
+                        data={Array.from(openConversations.entries())}
+                        keyExtractor={(item) => item[0].toString()}
                         renderItem={({item}) => {
-                            let time = lastMessages.get(item.conversation_id)?.time;
-                            let message = lastMessages.get(item.conversation_id)?.message;
+                            const [conversationId, messageData] = item;
+                            let time = messageData.message_time;
+                            let message = messageData.last_message;
                             return (
                                 <TouchableOpacity 
                                     className='flex-row items-center w-full h-20 px-4'
-                                    onPress={() => {setCurrentConversation(item.conversation_id); setConversationPartner(item.user_id); getAllMessages(item.conversation_id); setChatOpen(true)}}
+                                    onPress={() => {
+                                        setCurrentConversation(conversationId); 
+                                        setConversationPartner(messageData.user_id); 
+                                        getAllMessages(conversationId); 
+                                        setChatOpen(true);
+                                        zeroUnreadMessages(conversationId, userId!);
+                                    }}
                                 >
                                     <View className='flex justify-center items-center h-14 w-14 rounded-[100%] bg-secondary-two'>
                                         <Image source={require('@/assets/icons/user.png')} resizeMode='contain' className='h-8 w-8' style={{tintColor:"#64748b"}}/>
                                     </View>
                                     <View className='flex justify-center h-14 ml-4 flex-1'>
                                         <View className='flex-row justify-between'>
-                                            <Text className='font-staatliches text-white text-lg'>{item.user_id}</Text>
-                                            <Text className='font-oswald-extralight text-slate-500'>{time ? getCurrentTime(time) : ""}</Text>
+                                            <Text className='font-staatliches text-white text-lg'>{messageData.user_id}</Text>
+                                            <Text className='font-oswald-extralight' style={messageData.unread_messages > 0 ? {color: color} : {color: "#64748b"}}>
+                                                {time ? getCurrentTime(time) : ""}
+                                            </Text>
                                         </View>
-                                        <Text className='font-oswald-extralight text-slate-500' numberOfLines={1}>{message ? message : ""}</Text>
+                                        <View className="flex-row justify-between">
+                                            <Text className='font-oswald-extralight text-slate-500' numberOfLines={1}>{message ? message : ""}</Text>
+                                            {messageData.unread_messages > 0 && (
+                                                <View className="flex justify-center items-center h-5 w-5 rounded-full" style={{backgroundColor: color}}>
+                                                    <Text className="font-staatliches text-white leading-5">{messageData.unread_messages}</Text>
+                                                </View>
+                                            )}
+                                        </View>
                                     </View>
                                 </TouchableOpacity>
                             )
@@ -141,10 +165,11 @@ const MessagesScreen = ({
                                 className='h-8 w-8 mr-4'
                                 onPress={() => {
                                     socket?.emit("close_message", currentConversation);
+                                    zeroUnreadMessages(currentConversation!, userId!);
                                     setConversationPartner(null); 
                                     setCurrentConversation(null); 
                                     setMessageList([]); 
-                                    setChatOpen(false)
+                                    setChatOpen(false);
                                 }}
                             >
                                 <Image source={require("@/assets/icons/arrow-left.png")} resizeMode='contain' style={{tintColor:'white'}} className='h-8 w-8'/>
@@ -186,7 +211,7 @@ const MessagesScreen = ({
                                     />
                                     <TouchableOpacity 
                                         className='flex justify-center items-center w-12 h-12 overflow-hidden rounded-full' 
-                                        onPress={() => handleSendMessage(currentConversation!, userId!, messageText)}
+                                        onPress={() => handleSendMessage(currentConversation!, userId!, conversationPartner!, messageText)}
                                     >
                                         <View
                                             className='flex justify-center items-center h-12 w-12'
@@ -226,19 +251,18 @@ const MessagesScreen = ({
                         <View className="ml-4 mt-4">
                             <Text className="font-staatliches text-slate-400 text-lg">Contacts on Childway</Text>
                         </View>
+                        {/* List of contacts */}
                         <FlatList
                             data={contacts}
                             renderItem={({item}) => (
-                                <TouchableOpacity className="flex-row items-center h-20 w-full px-4">
+                                <TouchableOpacity className="flex-row items-center h-20 w-full px-4" onPress={() => handleNewChat(item.contactId)}>
                                     <View className='flex justify-center items-center h-14 w-14 rounded-[100%] bg-secondary-two'>
                                         <Image source={require('@/assets/icons/user.png')} resizeMode='contain' className='h-8 w-8' style={{tintColor:"#64748b"}}/>
                                     </View>
                                     <Text className="font-staatliches text-white ml-4 text-lg">{item.contactId}</Text>
                                 </TouchableOpacity>
                             )}
-                        >
-
-                        </FlatList>
+                        />
                     </View>
                 </SafeAreaView>
             </Modal>

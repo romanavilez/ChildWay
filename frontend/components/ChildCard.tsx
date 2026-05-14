@@ -4,6 +4,7 @@ import { MapView, Camera, MarkerView, Images } from '@rnmapbox/maps'
 
 type ChildCardProps = {
     name: string
+    profilePic: string
     distance: string | null
     speed: string
     longitude: number | null
@@ -11,7 +12,7 @@ type ChildCardProps = {
     setScroll: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function ChildCard({name, distance, speed, longitude, latitude, setScroll} : ChildCardProps) {
+export default function ChildCard({name, profilePic, distance, speed, longitude, latitude, setScroll} : ChildCardProps) {
     return (
         <View className='w-full rounded-2xl p-3 bg-slate-800 mb-4'>
             {/* Child Info */}
@@ -30,9 +31,22 @@ export default function ChildCard({name, distance, speed, longitude, latitude, s
                     />
                     {longitude && latitude && (
                         <View>
-                            <Camera centerCoordinate={[longitude, latitude]} zoomLevel={13}/>
+                            <Camera centerCoordinate={[longitude, latitude + 0.002]} zoomLevel={13}/>
                             <MarkerView coordinate={[longitude, latitude]} anchor={{x:0.5, y:1}}>
-                                <Image source={require('@/assets/icons/map-marker-smile.png')} style={{height: 30, width: 30}} resizeMode='contain'/>
+                                <View className='flex items-center'>
+                                    {profilePic ? (
+                                        <View className='relative flex justify-center items-center h-[65px] w-[65px] rounded-3xl bg-white mb-2'>
+                                            <View className='flex justify-center items-center h-[55px] w-[55px] rounded-3xl overflow-hidden'>
+                                                <Image source={{uri:profilePic}} resizeMode='contain' className='h-[55px] w-[55px]'/>
+                                            </View>
+                                            <View className='absolute -bottom-2 left-[37%] h-5 w-5 rotate-45 rounded-md bg-white -z-10'/>
+                                        </View>
+                                    ) : (
+                                        <View className='flex items-center'>
+                                            <Image source={require('@/assets/icons/map-marker-smile.png')} style={{height: 30, width: 30}} resizeMode='contain'/>
+                                        </View>
+                                    )}
+                                </View>
                             </MarkerView>
                         </View>
                     )}

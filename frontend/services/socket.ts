@@ -2,12 +2,17 @@ import {io, Socket} from 'socket.io-client'
 
 let socket : Socket | null = null;
 
+type childrenProps = {
+    childId: string,
+    profilePic: string
+}
+
 // On connection, join each child's room
-const joinChildren = (children: string[]) => {
+const joinChildren = (children: childrenProps[]) => {
     console.log("Socket id:", socket?.id);
     for (const child of children) {
-        console.log("joining child:", child)
-        socket?.emit("join_child", child);
+        console.log("joining child:", child.childId)
+        socket?.emit("join_child", child.childId);
     }
 }
 

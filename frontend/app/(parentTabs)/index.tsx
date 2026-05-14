@@ -21,9 +21,13 @@ export default function index() {
         lng: number
         speed: number
     }
+    type childrenProps = {
+        childId: string,
+        profilePic: string
+    }
 
     // Use states
-    const [children, setChildren] = useState<string[]>([]);
+    const [children, setChildren] = useState<childrenProps[]>([]);
     const [childLocations, setChildLocations] = useState<Record<string, ChildLocation>>({});
 
     // Variables
@@ -80,13 +84,24 @@ export default function index() {
                         <Camera followUserLocation followZoomLevel={13}/>
                         <LocationPuck puckBearingEnabled puckBearing='heading' pulsing={{isEnabled:true}}/>
                         {children.map((item) => {
-                            let location = childLocations[item];
+                            let location = childLocations[item.childId];
                             if (!location) return null;
                             return (
-                                <MarkerView key={item} coordinate={[location.lng, location.lat]} anchor={{x:0.5, y:1}} allowOverlap={true} allowOverlapWithPuck={true}>
+                                <MarkerView key={item.childId} coordinate={[location.lng, location.lat]} anchor={{x:0.5, y:1}} allowOverlap={true} allowOverlapWithPuck={true}>
                                     <View className='flex items-center'>
-                                        <Text className='font-staatliches'>{item}</Text>
-                                        <Image source={require('@/assets/icons/map-marker-smile.png')} style={{width: 30, height: 30}} resizeMode='contain'/>
+                                        {item.profilePic ? (
+                                            <View className='relative flex justify-center items-center h-[65px] w-[65px] rounded-3xl bg-white mb-2'>
+                                                <View className='flex justify-center items-center h-[55px] w-[55px] rounded-3xl overflow-hidden'>
+                                                    <Image source={{uri:item.profilePic}} resizeMode='contain' className='h-[55px] w-[55px]'/>
+                                                </View>
+                                                <View className='absolute -bottom-2 left-[37%] h-5 w-5 rotate-45 rounded-md bg-white -z-10'/>
+                                            </View>
+                                        ) : (
+                                            <View className='flex items-center'>
+                                                <Text className='font-staatliches'>{item.childId}</Text>
+                                                <Image source={require('@/assets/icons/map-marker-smile.png')} style={{width: 30, height: 30}} resizeMode='contain'/>
+                                            </View>
+                                        )}
                                     </View>
                                 </MarkerView>
                             )

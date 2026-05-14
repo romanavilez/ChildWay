@@ -19,6 +19,10 @@ export default function children() {
         lng: number
         speed: number
     }
+    type childrenProps = {
+        childId: string, 
+        profilePic: string
+    }
 
     // variables
     const socket = getSocket();
@@ -26,7 +30,7 @@ export default function children() {
 
     // use states
     const [scrollEnabled, setScrollEnabled] = useState(true);
-    const [children, setChildren] = useState([]);
+    const [children, setChildren] = useState<childrenProps[]>([]);
     const [childLocations, setChildLocations] = useState<Record<string, ChildLocation>>({});
     const [parentLocation, setParentLocation] = useState<{lat: number, lng: number} | null>(null)    
     // calculate shortest distance between two points on a sphere
@@ -110,10 +114,11 @@ export default function children() {
                 <FlatList
                     data={children}
                     renderItem={({item}) => {
-                        let location = childLocations[item];
+                        let location = childLocations[item.childId];
                         return (
                             <ChildCard
-                                name={item}
+                                name={item.childId}
+                                profilePic={item.profilePic}
                                 distance={parentLocation && location ? haversine(parentLocation.lat, parentLocation.lng, location.lat, location.lng) : "0"}
                                 speed={
                                     location ? location?.speed <= 0.25 ? "0 mph" : `${(location?.speed * 2.2369363).toFixed(2)} mph` : 'N/A'

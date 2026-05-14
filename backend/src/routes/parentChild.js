@@ -28,7 +28,8 @@ router.get("/get-all-children/:parentId", (req, res) => {
         [parentId],
         (err, results=[]) => {
             if (err) res.status(500).json({error: err});
-            return res.status(200).json({res: results});
+            const children = results.map((row) => row.child_id);
+            return res.status(200).json({res: children});
         }
     )
 })

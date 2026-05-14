@@ -53,7 +53,6 @@ export default function messages() {
         const data = await res.json();
 
         if (res.ok) {
-            console.log("get all contacts:", data.parents);
             setContacts(data.parents.map((contact: contactProps) => (
                 {contactId: contact.parent_id}
             )));

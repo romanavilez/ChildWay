@@ -2,6 +2,7 @@ import { View, Text, FlatList, Image } from 'react-native'
 import React, {useEffect, useState, useCallback} from 'react'
 import { useFocusEffect } from '@react-navigation/native';
 import Mapbox, {Camera, MapView, LocationPuck, MarkerView} from '@rnmapbox/maps';
+import { useAuthStore } from '@/store/auth.store';
 
 import { getSocket } from '@/services/socket';
 
@@ -22,15 +23,38 @@ export default function index() {
     }
 
     // Use states
-    const [children, setChildren] = useState(["ravilez", "bjr"]);
+    const [children, setChildren] = useState<string[]>([]);
     const [childLocations, setChildLocations] = useState<Record<string, ChildLocation>>({});
 
+    // Variables
+    const socket = getSocket();
+    const parentId = useAuthStore((state) => state.username);
 
     useFocusEffect(
         useCallback(() => {
             // Grab socket
-            const socket = getSocket();
-            if (!socket) return;
+            if (!socket || !parentId) return;
+
+            // Initialize children
+            const getAllChildren = async () => {
+                try {
+                    const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/parentChildren/get-all-children/${parentId}`, {
+                        method: "GET",
+                        headers: {"Content-Type" : "application/json"}
+                    });
+            
+                    const data = await res.json();
+            
+                    if (res.ok) {
+                        setChildren(data.res);
+                    } else {
+                        console.log("Error getting children:", data.error);
+                    }
+                } catch (error) {
+                    console.log("Error getting children:", error);
+                }
+            }
+            getAllChildren();
             
             // Append new child and location or update location
             const handleLocationUpdate = (data:LocationUpdateProps) => {
@@ -45,7 +69,7 @@ export default function index() {
             return () => {
                 socket.off("location_update", handleLocationUpdate);
             }
-        }, [children])
+        }, [socket, parentId])
     );
 
     return (

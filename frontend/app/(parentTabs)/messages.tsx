@@ -56,7 +56,6 @@ export default function messages() {
             setContacts(data.res.map((contact: contactProps) => (
                 {contactId: contact.child_id}
             )));
-            console.log("Get all contacts:", data.res);
         } else {
             console.log("Error getting contacts:", data.error);
         }

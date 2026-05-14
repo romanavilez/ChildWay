@@ -23,8 +23,8 @@ const handleConnect = async (userId: String, socket: Socket) => {
         if (res.ok) {
             // handle connection when socket connects
             const children = data.res;
-            if (socket.connected) joinChildren(children.map((child:any) => child.child_id));
-            else socket.once("connect", () => joinChildren(children.map((child:any) => child.child_id)));
+            if (socket.connected) joinChildren(children);
+            else socket.once("connect", () => joinChildren(children));
         }
 
     } catch (error) {

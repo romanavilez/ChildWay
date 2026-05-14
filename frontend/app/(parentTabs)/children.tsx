@@ -4,6 +4,7 @@ import ChildCard from '@/components/ChildCard'
 import { getSocket } from '@/services/socket'
 import { useFocusEffect } from '@react-navigation/native'
 import * as Location from 'expo-location'
+import { useAuthStore } from '@/store/auth.store'
 
 export default function children() {
     // types
@@ -19,9 +20,13 @@ export default function children() {
         speed: number
     }
 
+    // variables
+    const socket = getSocket();
+    const parentId = useAuthStore((state) => state.username);
+
     // use states
     const [scrollEnabled, setScrollEnabled] = useState(true);
-    const [children, setChildren] = useState(["ravilez", "bjr"]);
+    const [children, setChildren] = useState([]);
     const [childLocations, setChildLocations] = useState<Record<string, ChildLocation>>({});
     const [parentLocation, setParentLocation] = useState<{lat: number, lng: number} | null>(null)    
     // calculate shortest distance between two points on a sphere
@@ -47,10 +52,29 @@ export default function children() {
 
     useFocusEffect(
         useCallback(() => {
-            // Grab socket
-            const socket = getSocket();
-            if (!socket) return;
+            if (!socket || !parentId) return;
             
+            // Initialize children
+            const getAllChildren = async () => {
+                try {
+                    const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/parentChildren/get-all-children/${parentId}`, {
+                        method: "GET",
+                        headers: {"Content-Type" : "application/json"}
+                    });
+            
+                    const data = await res.json();
+            
+                    if (res.ok) {
+                        setChildren(data.res);
+                    } else {
+                        console.log("Error getting children:", data.error);
+                    }
+                } catch (error) {
+                    console.log("Error getting children:", error);
+                }
+            }
+            getAllChildren();
+
             // Append new child and location or update location
             const handleLocationUpdate = (data:LocationUpdateProps) => {
                 setChildLocations(prev => ({
@@ -64,7 +88,7 @@ export default function children() {
             return () => {
                 socket.off("location_update", handleLocationUpdate);
             }
-        }, [children])
+        }, [socket, parentId])
     );
 
     useEffect(() => {
@@ -102,8 +126,6 @@ export default function children() {
                     }}
                     scrollEnabled={scrollEnabled}
                 />
-                {/* <ChildCard name='Roman' distance={1.4} status='Walking' longitude={-122.18593431346928} latitude={47.76900787464037} setScroll={setScrollEnabled}/>
-                <ChildCard name='Bobby' distance={2.3} status='At school' longitude={-122.19088786842046} latitude={47.758598857794226} setScroll={setScrollEnabled}/> */}
             </View>
         </View>
     )

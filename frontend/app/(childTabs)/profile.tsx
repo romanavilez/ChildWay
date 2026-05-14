@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { router } from 'expo-router'
 import { useAuthStore } from '@/store/auth.store'
 import QRCode from 'react-native-qrcode-svg'
+import ProfilePicture from '@/components/ProfilePicture'
 
 const profile = () => {
     // Auth store
@@ -40,6 +41,7 @@ const profile = () => {
 
     return (
         <View className='flex-1 bg-secondary'>
+            <ProfilePicture />
             <View className='flex flex-1 px-2 items-center justify-center'>
                 <TouchableOpacity 
                     className='flex justify-center items-center w-5/6 h-20 rounded-3xl bg-primary-two'

@@ -4,6 +4,7 @@ import { router } from 'expo-router'
 import { useAuthStore } from '@/store/auth.store'
 import { Camera, CameraView, BarcodeScanningResult} from 'expo-camera'
 import * as Notifications from "expo-notifications"
+import ProfilePicture from '@/components/ProfilePicture'
 
 export default function profile() {
     // Auth store
@@ -98,6 +99,7 @@ export default function profile() {
 
     return (
         <View className='flex-1 bg-secondary'>
+            <ProfilePicture />
             <View className='flex flex-1 px-2 items-center justify-center'>
                 <TouchableOpacity 
                     className='flex justify-center items-center w-5/6 h-20 rounded-3xl bg-tertiary-two'

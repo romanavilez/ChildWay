@@ -1,6 +1,8 @@
 import express from "express";
 import {db} from "../lib/db.js"
 import bcrypt from 'bcrypt'
+import upload from '../lib/multer.js'
+import cloudinary from '../lib/cloudinary.js'
 
 const router = express.Router();
 
@@ -66,7 +68,51 @@ router.post("/signup", async (req, res) => {
             return res.status(200).json({success:true});
         }
     )
+});
 
+// Update profile picture
+router.post("/update-profile-pic", upload.single('image') , async (req, res) => {
+    const {userId} = req.body;
+
+    if (!userId) return res.status(400).json({error: "Missing required profile pic update fields"});
+
+    if (!req.file) {
+        return res.status(400).json({error: "no image uploaded"});
+    }
+    // upload picture to cloudinary
+    const result = await cloudinary.uploader.upload(
+        req.file.path,
+        {
+            folder: 'profile_pictures'
+        }
+    );
+    // grab cloudinary url
+    const imageUrl = result.secure_url;
+    // update user profile pic in database
+    db.query(
+        "UPDATE user SET profile_pic = ? WHERE username = ?",
+        [imageUrl, userId],
+        (err, results) => {
+            if (err) return res.status(500).json({error: err});
+            return res.status(200).json({success: true, imageUrl: imageUrl});
+        }
+    )
+});
+
+// Grab profile picture
+router.get("/profile-pic/:userId", (req, res) => {
+    const {userId} = req.params;
+
+    db.query(
+        "SELECT profile_pic FROM user WHERE username = ?",
+        [userId],
+        (err, results=[]) => {
+            if (err) return res.status(500).json({error: err});
+            if (results.length === 0) return res.status(404).json({error: "User not found"});
+            if (results[0].profile_pic === null) return res.status(200).json({success: false})
+            return res.status(200).json({success: true, profilePic: results[0].profile_pic});
+        }
+    )
 });
 
 export default router;

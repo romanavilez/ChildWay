@@ -5,6 +5,7 @@ import { Platform } from "react-native"
 import * as SecureStore from 'expo-secure-store'
 import 'react-native-get-random-values'
 import {v4 as uuidv4} from 'uuid'
+import { router } from "expo-router"
 
 const DEVICE_KEY = "device_id";
 
@@ -53,14 +54,25 @@ export const useNotifications = (userId:string | null) => {
             }
 
         });
+        
         // notification sent
         notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
             console.log("notification:",notification);
         });
+
         // user clicks on notification
-        responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-            console.log("response:",response);
-        });
+        const handleNotification = (response : any) => {
+            const notificationType = response.notification.request.content.data.type; 
+            if (notificationType === 'sos') router.push("/children");
+            else if (notificationType === 'message') router.push("/messages");
+        }
+        responseListener.current = Notifications.addNotificationResponseReceivedListener(handleNotification);
+
+        // Handle notification if app was killed
+        (() => {
+            const response = Notifications.getLastNotificationResponse();
+            if (response) handleNotification(response);
+        })();
 
         return () => {
             notificationListener.current?.remove();

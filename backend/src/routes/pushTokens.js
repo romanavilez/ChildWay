@@ -26,21 +26,24 @@ router.post("/store-push", (req, res) => {
     )
 });
 
-router.post("/send-message/:userId", (req, res) => {
-    const {userId} = req.params;
+router.post("/send-sos", (req, res) => {
     const {title, body, data} = req.body;
-
-    if (!title || !body) return res.status(400).json({error: "Missing title or body"});
+    if (!title || !body || !data) return res.status(400).json({error: "Missing required notification fields"});
 
     db.query(
-        "SELECT token FROM push_token WHERE user_id = ?",
-        [userId],
+        `
+        SELECT pt.token FROM push_token pt
+        JOIN parent_child pc ON pc.parent_id = pt.user_id
+        WHERE child_id = ?
+        `,
+        [data.sender],
         async (err, results=[]) => {
-            if (err) return res.status(500).json({error: "DB error"});
-            if (!results.length) return res.status(404).json({error: `No push tokens registered for ${userId}`});
+            if (err) return res.status(500).json({error: "Error getting parents"});
+            if (!results.length) return res.status(404).json({error: "No parents are registered for push notifications"});
             await sendPushNotification(results.map((t) => t.token), {title, body, data});
+            return res.status(200).json({success: true});
         }
     )
-}) 
+})
 
 export default router;

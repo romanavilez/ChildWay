@@ -37,6 +37,7 @@ export const useMessages = () => {
 
     // Auth states
     const userId = useAuthStore((state) => state.username);
+    const userType = useAuthStore((state) => state.userType);
 
     // Grab current time in 12 hour format
     const getCurrentTime = (timestamp: string) => {
@@ -130,6 +131,35 @@ export const useMessages = () => {
         }
     }
 
+    // Send message notification
+    const sendMessageNotification = async (sender: string, conversationPartner: string, text: string) => {
+        const title = sender;
+        const body = text;
+        const role = userType === "parent" ? "child" : "parent";
+        const data = {
+            type: "message",
+            sender: sender,
+            recipientType: role
+        };
+        const recipient = conversationPartner;
+
+        try {
+            const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/pushTokens/send-message`, {
+                method: "POST",
+                headers: {"Content-Type" : "application/json"},
+                body: JSON.stringify({recipient, title, body, data})
+            })
+    
+            const data_ = await res.json();
+
+            if (!res.ok) {
+                console.log("Error sending message notification:", data_.error);
+            } 
+        } catch (error) {
+            console.log("Error sending message notification:", error);
+        }
+    }
+
     // Logic when sending a message
     const handleSendMessage = async (conversationId: number, sender: string, conversationPartner: string, text: string) => {
         let createdAt: string = "";
@@ -156,6 +186,7 @@ export const useMessages = () => {
         if (!createdAt) createdAt = new Date().toISOString();
         const message = {"conversation_id": conversationId, "sender_id": sender, "message_text": text, "created_at": createdAt};
         setMessageList((prev) => [...prev, message]);
+        sendMessageNotification(sender, conversationPartner, text);
         setMessageText("");
         // Update last message
         updateLastMessage(text, conversationId);

@@ -54,29 +54,41 @@ export const useNotifications = (userId:string | null) => {
             }
 
         });
-        
+
         // notification sent
-        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-            console.log("notification:",notification);
-        });
+        // notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+        //     console.log("notification:",notification);
+        // });
 
         // user clicks on notification
         const handleNotification = (response : any) => {
-            const notificationType = response.notification.request.content.data.type; 
-            if (notificationType === 'sos') router.push("/children");
-            else if (notificationType === 'message') router.push("/messages");
+            const data = response.notification.request.content.data; 
+            if (data.type === 'sos') router.replace("/children");
+            else if (data.type === 'message') {
+                if (data.recipientType === 'child') {
+                    router.replace("/parents");
+                } else if (data.recipientType === 'parent') {
+                    router.replace("/messages");
+                }
+            }
         }
         responseListener.current = Notifications.addNotificationResponseReceivedListener(handleNotification);
 
         // Handle notification if app was killed
-        (() => {
+        const timeout = setTimeout(() => {
             const response = Notifications.getLastNotificationResponse();
-            if (response) handleNotification(response);
-        })();
+            if (!response) return; 
+            // Do not route to notification
+            const ageInSeconds = (Date.now() - response.notification.date) / 1000;
+            if (ageInSeconds < 5) {
+                handleNotification(response);
+            }
+        }, 0);
 
         return () => {
             notificationListener.current?.remove();
             responseListener.current?.remove();
+            clearTimeout(timeout);
         }
     }, [userId]);
 }

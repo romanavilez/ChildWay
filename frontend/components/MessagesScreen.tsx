@@ -10,7 +10,8 @@ type conversationProps = {
     last_message: string,
     message_time: string,
     unread_messages: number,
-    user_id: string
+    user_id: string,
+    profile_pic: string | null
 };
 
 type messageProps = {
@@ -21,7 +22,13 @@ type messageProps = {
 };
 
 type contactProps = {
-    contactId: string
+    contactId: string,
+    profilePic: string
+}
+
+type conversationPartnerProps = {
+    userId: string,
+    profilePic: string | null
 }
 
 type MessageScreenProps = {
@@ -33,7 +40,7 @@ type MessageScreenProps = {
     messageText: string,
     contacts: contactProps[] | [],
     chatOpen: boolean,
-    conversationPartner: string | null,
+    conversationPartner: conversationPartnerProps | null,
     newChatOpen: boolean,
     userId: string | null,
     color: string,
@@ -42,11 +49,11 @@ type MessageScreenProps = {
     setMessageList: React.Dispatch<React.SetStateAction<messageProps[] | []>>,
     setContacts: React.Dispatch<React.SetStateAction<contactProps[] | []>>,
     setChatOpen: React.Dispatch<React.SetStateAction<boolean>>,
-    setConversationPartner: React.Dispatch<React.SetStateAction<string | null>>,
+    setConversationPartner: React.Dispatch<React.SetStateAction<conversationPartnerProps | null>>,
     setNewChatOpen: React.Dispatch<React.SetStateAction<boolean>>,
     zeroUnreadMessages: (conversationId: number, userId: string) => void,
-    handleSendMessage: (conversationId: number, sender: string, conversationPartner: string, text: string) => void
-    handleNewChat: (conversationPartner: string) => void
+    handleSendMessage: (conversationId: number, sender: string, conversationPartner: string, text: string) => void,
+    handleNewChat: (conversationPartner: string, profilePic: string) => void,
     getAllContacts: () => void,
     getAllMessages: (conversation_id: number) => void,
     getCurrentTime: (timestamp: string) => string,
@@ -101,15 +108,21 @@ const MessagesScreen = ({
                                     className='flex-row items-center w-full h-20 px-4'
                                     onPress={() => {
                                         setCurrentConversation(conversationId); 
-                                        setConversationPartner(messageData.user_id); 
+                                        setConversationPartner({userId: messageData.user_id, profilePic: messageData.profile_pic}); 
                                         getAllMessages(conversationId); 
                                         setChatOpen(true);
                                         zeroUnreadMessages(conversationId, userId!);
                                     }}
                                 >
-                                    <View className='flex justify-center items-center h-14 w-14 rounded-[100%] bg-secondary-two'>
-                                        <Image source={require('@/assets/icons/user.png')} resizeMode='contain' className='h-8 w-8' style={{tintColor:"#64748b"}}/>
+                                    {/* profile pic */}
+                                    <View className='flex justify-center items-center h-14 w-14 rounded-[100%] bg-secondary-two overflow-hidden'>
+                                        {messageData.profile_pic ? (
+                                            <Image source={{uri:messageData.profile_pic}} className="h-14 w-14"/>
+                                        ) : (
+                                            <Image source={require('@/assets/icons/user.png')} resizeMode='contain' className='h-8 w-8' style={{tintColor:"#64748b"}}/>
+                                        )}
                                     </View>
+                                    {/* conversation info */}
                                     <View className='flex justify-center h-14 ml-4 flex-1'>
                                         <View className='flex-row justify-between'>
                                             <Text className='font-staatliches text-white text-lg'>{messageData.user_id}</Text>
@@ -174,10 +187,14 @@ const MessagesScreen = ({
                             >
                                 <Image source={require("@/assets/icons/arrow-left.png")} resizeMode='contain' style={{tintColor:'white'}} className='h-8 w-8'/>
                             </TouchableOpacity>
-                            <View className='flex justify-center items-center h-12 w-12 rounded-[100%] bg-secondary-two'>
-                                <Image source={require('@/assets/icons/user.png')} resizeMode='contain' className='h-7 w-7' style={{tintColor:"#64748b"}}/>
+                            <View className='flex justify-center items-center h-12 w-12 rounded-[100%] bg-secondary-two overflow-hidden'>
+                                {conversationPartner?.profilePic ? (
+                                    <Image source={{uri:conversationPartner.profilePic}} className="h-12 w-12"/>
+                                ) : (
+                                    <Image source={require('@/assets/icons/user.png')} resizeMode='contain' className='h-7 w-7' style={{tintColor:"#64748b"}}/>
+                                )}
                             </View>
-                            <Text className='font-staatliches text-white text-xl ml-4'>{conversationPartner}</Text>
+                            <Text className='font-staatliches text-white text-xl ml-4'>{conversationPartner?.userId}</Text>
                         </View>
                         <View className='w-[95%] h-[2px] self-center rounded-2xl bg-white'/>
                         {/* Chat container */}
@@ -211,7 +228,7 @@ const MessagesScreen = ({
                                     />
                                     <TouchableOpacity 
                                         className='flex justify-center items-center w-12 h-12 overflow-hidden rounded-full' 
-                                        onPress={() => handleSendMessage(currentConversation!, userId!, conversationPartner!, messageText)}
+                                        onPress={() => handleSendMessage(currentConversation!, userId!, conversationPartner?.userId!, messageText)}
                                     >
                                         <View
                                             className='flex justify-center items-center h-12 w-12'
@@ -255,9 +272,13 @@ const MessagesScreen = ({
                         <FlatList
                             data={contacts}
                             renderItem={({item}) => (
-                                <TouchableOpacity className="flex-row items-center h-20 w-full px-4" onPress={() => handleNewChat(item.contactId)}>
-                                    <View className='flex justify-center items-center h-14 w-14 rounded-[100%] bg-secondary-two'>
-                                        <Image source={require('@/assets/icons/user.png')} resizeMode='contain' className='h-8 w-8' style={{tintColor:"#64748b"}}/>
+                                <TouchableOpacity className="flex-row items-center h-20 w-full px-4" onPress={() => handleNewChat(item.contactId, item.profilePic)}>
+                                    <View className='flex justify-center items-center h-14 w-14 rounded-[100%] bg-secondary-two overflow-hidden'>
+                                        {item.profilePic ? (
+                                            <Image source={{uri:item.profilePic}} resizeMode="contain" className="h-14 w-14"/>
+                                        ) : (
+                                            <Image source={require('@/assets/icons/user.png')} resizeMode='contain' className='h-8 w-8' style={{tintColor:"#64748b"}}/>
+                                        )}
                                     </View>
                                     <Text className="font-staatliches text-white ml-4 text-lg">{item.contactId}</Text>
                                 </TouchableOpacity>

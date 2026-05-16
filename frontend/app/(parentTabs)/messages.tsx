@@ -9,7 +9,8 @@ import MessagesScreen from '@/components/MessagesScreen';
 export default function messages() {
     // type
     type contactProps = {
-        child_id: string
+        childId: string,
+        profilePic: string
     }
 
     const socket = getSocket();
@@ -54,7 +55,7 @@ export default function messages() {
 
         if (res.ok) {
             setContacts(data.res.map((contact: contactProps) => (
-                {contactId: contact.child_id}
+                {contactId: contact.childId, profilePic: contact.profilePic}
             )));
         } else {
             console.log("Error getting contacts:", data.error);

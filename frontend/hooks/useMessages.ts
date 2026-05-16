@@ -11,11 +11,18 @@ export const useMessages = () => {
         last_message: string,
         message_time: string,
         unread_messages: number,
-        user_id: string
+        user_id: string,
+        profile_pic: string | null
     }
 
     type contactProps = {
-        contactId: string
+        contactId: string,
+        profilePic: string
+    }
+
+    type conversationPartnerProps = {
+        userId: string,
+        profilePic: string | null
     }
 
     // Use states
@@ -31,7 +38,7 @@ export const useMessages = () => {
     const [currentConversation, setCurrentConversation] = useState<number | null>(null);
     const [keyboardVisible, setKeyboardVisible] = useState(false); 
     const [chatOpen, setChatOpen] = useState(false);
-    const [conversationPartner, setConversationPartner] = useState<string | null>(null);
+    const [conversationPartner, setConversationPartner] = useState<conversationPartnerProps | null>(null);
     const [newChatOpen, setNewChatOpen] = useState(false);
     const [unreadMessages, setUnreadMessages] = useState(0);
 
@@ -224,12 +231,13 @@ export const useMessages = () => {
 
         if (res.ok) {
             setOpenConversations(new Map(
-                data.conversations.map((conversation: {conversation_id: number, last_message: string, message_time: string, unread_messages: number, user_id: string}) => [
+                data.conversations.map((conversation: {conversation_id: number, last_message: string, message_time: string, unread_messages: number, user_id: string , profile_pic: string}) => [
                     conversation.conversation_id, {
                         last_message: conversation.last_message,
                         message_time: conversation.message_time,
                         unread_messages: conversation.unread_messages,
-                        user_id: conversation.user_id
+                        user_id: conversation.user_id,
+                        profile_pic: conversation.profile_pic
                     }
                 ])
             ));
@@ -254,7 +262,7 @@ export const useMessages = () => {
     }
 
     // handles a new conversation being opened
-    const handleNewChat = async (conversationPartner: string) => {
+    const handleNewChat = async (conversationPartner: string, profilePic: string | null) => {
         // Attempt to create conversation
         const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/conversations/create-conversation`, {
             method: "POST",
@@ -267,12 +275,12 @@ export const useMessages = () => {
         if (res.ok) {
             const conversationId = data.conversationId;
             setCurrentConversation(conversationId);
-            setConversationPartner(conversationPartner);
+            setConversationPartner({userId: conversationPartner, profilePic});
             if (data.success) {
                 // conversation doesn't already exist
                 addParticipant(conversationId, userId);
                 addParticipant(conversationId, conversationPartner);
-                const newConversation: conversationProps = {last_message:"", message_time:"", unread_messages: 0, user_id: conversationPartner};
+                const newConversation: conversationProps = {last_message:"", message_time:"", unread_messages: 0, user_id: conversationPartner, profile_pic: profilePic};
                 setOpenConversations((prev) => {
                     let updated = new Map(prev);
 

@@ -37,15 +37,17 @@ router.get("/get-all-conversations/:userId", (req, res) => {
 
     db.query(
         `
-        SELECT c.conversation_id, c.last_message, c.message_time, cp1.unread_messages, cp2.user_id FROM conversation c
+        SELECT c.conversation_id, c.last_message, c.message_time, cp1.unread_messages, cp2.user_id, u.profile_pic FROM conversation c
         JOIN conversation_participant cp1 ON c.conversation_id = cp1.conversation_id
         JOIN conversation_participant cp2 ON c.conversation_id = cp2.conversation_id
+        JOIN user u ON u.username = cp2.user_id
         WHERE cp1.user_id = ? AND cp2.user_id != ? AND c.type = 'direct'
         ORDER BY c.message_time DESC
         `,
         [userId, userId],
         (err, results=[]) => {
             if (err) return res.status(500).json({error: err});
+            console.log("results:",results);
             return res.status(200).json({conversations: results});
         }
     );

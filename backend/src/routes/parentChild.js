@@ -42,10 +42,15 @@ router.get("/get-all-parents/:childId", (req, res) => {
     const {childId} = req.params;
 
     db.query(
-        "SELECT parent_id FROM parent_child WHERE child_id = ?", 
+        `
+        SELECT pc.parent_id, u.profile_pic FROM parent_child pc
+        JOIN user u ON u.username = pc.parent_id
+        WHERE pc.child_id = ?
+        `, 
         [childId],
         (err, results=[]) => {
             if (err) return res.status(500).json({error: err});
+            const parents = results.map((row) => ({parentId: row.parent_id, profilePic: row.profile_pic}));
             return res.status(200).json({parents: results});
         }
     );

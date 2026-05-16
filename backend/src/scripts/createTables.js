@@ -35,16 +35,12 @@ export const createTables = async () => {
     // Alert table creation
     const alert = `
         CREATE TABLE IF NOT EXISTS alert (
+            alert_id BIGINT AUTO_INCREMENT PRIMARY KEY,
             child_id VARCHAR(255) NOT NULL,
-            parent_id VARCHAR(255) NOT NULL,
             time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             alert_type VARCHAR(50) NOT NULL CHECK(alert_type IN ('geofence', 'sos', 'anomaly', 'offline', 'battery')),
-            message TEXT,
-            longitude DECIMAL(9,6) NOT NULL,
-            latitude DECIMAL(9,6) NOT NULL,
-            PRIMARY KEY (child_id, parent_id, time),
-            FOREIGN KEY (child_id) REFERENCES user(username),
-            FOREIGN KEY (parent_id) REFERENCES user(username)
+            alert_body TEXT,
+            FOREIGN KEY (child_id) REFERENCES user(username)
         );
     `;
     db.query(alert, (err) => {

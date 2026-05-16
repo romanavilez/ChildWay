@@ -23,6 +23,10 @@ export default function children() {
         childId: string, 
         profilePic: string
     }
+    type alertProps = {
+        time: string,
+        alert_body: string
+    }
 
     // variables
     const socket = getSocket();
@@ -32,7 +36,8 @@ export default function children() {
     const [scrollEnabled, setScrollEnabled] = useState(true);
     const [children, setChildren] = useState<childrenProps[]>([]);
     const [childLocations, setChildLocations] = useState<Record<string, ChildLocation>>({});
-    const [parentLocation, setParentLocation] = useState<{lat: number, lng: number} | null>(null)    
+    const [parentLocation, setParentLocation] = useState<{lat: number, lng: number} | null>(null);
+    const [alerts, setAlerts] = useState<Map<string, alertProps[]>>(new Map());
     // calculate shortest distance between two points on a sphere
     const haversine = (lat1:number, lng1:number, lat2:number, lng2:number) => {
         // distance between latitudes
@@ -106,6 +111,43 @@ export default function children() {
 
         getParentLocation();
     }, [])
+
+    useEffect(() => {
+        if (!children) return;
+
+        // Initialize alerts
+        const getAllAlerts = async () => {
+            try {
+                const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/alerts/all-alerts/${parentId}`, {
+                    method: "GET",
+                    headers: {"Content-Type" : "application/json"}
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    const alerts = data.alerts;
+                    
+                    setAlerts(() => {
+                        let updated = new Map();
+
+                        children.forEach((child: childrenProps) => {
+                            const childAlerts = alerts.filter((alert: any) => {return alert.child_id === child.childId});
+                            updated.set(child.childId, childAlerts);
+                        });
+                        
+                        return updated;
+                    })
+                } else {
+                    console.log("Failed to get alerts:", data.error);
+                }
+            } catch (error) {
+                console.log("Failed to get alerts:", error);
+            }
+        }
+        getAllAlerts();
+
+    }, [children])
     
 
     return (
@@ -125,6 +167,7 @@ export default function children() {
                                 }
                                 longitude={location?.lng || null}
                                 latitude={location?.lat || null}
+                                alerts={alerts.get(item.childId) ?? []}
                                 setScroll={setScrollEnabled}
                             />
                         )

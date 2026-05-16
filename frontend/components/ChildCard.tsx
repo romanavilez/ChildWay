@@ -1,6 +1,12 @@
-import { View, Text, ScrollView, Image } from 'react-native'
+import { View, Text, ScrollView, Image, FlatList } from 'react-native'
 import React from 'react'
 import { MapView, Camera, MarkerView, Images } from '@rnmapbox/maps'
+
+
+type alertProps = {
+    time: string, 
+    alert_body: string
+}
 
 type ChildCardProps = {
     name: string
@@ -9,10 +15,21 @@ type ChildCardProps = {
     speed: string
     longitude: number | null
     latitude: number | null
+    alerts: alertProps[]
     setScroll: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function ChildCard({name, profilePic, distance, speed, longitude, latitude, setScroll} : ChildCardProps) {
+export default function ChildCard({name, profilePic, distance, speed, longitude, latitude, alerts, setScroll} : ChildCardProps) {
+    // Grab current time in 12 hour format
+    const getCurrentTime = (timestamp: string) => {
+        const time = new Date(timestamp).toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+        return time;
+    }
+
     return (
         <View className='w-full rounded-2xl p-3 bg-slate-800 mb-4'>
             {/* Child Info */}
@@ -55,14 +72,19 @@ export default function ChildCard({name, profilePic, distance, speed, longitude,
             {/* Alerts */}
             <View className='h-32 rounded-2xl mt-2'>
                 <Text className='text-xl color-tertiary font-staatliches'>Alerts</Text>
-                <ScrollView persistentScrollbar={true} nestedScrollEnabled={true}>
-                    <Text className='font-oswald-extralight color-white'>3:40 PM - Unusual route detected</Text>
-                    <Text className='font-oswald-extralight color-white'>3:35 PM - Longer stop than usual</Text>
-                    <Text className='font-oswald-extralight color-white'>3:30 PM - Left school</Text>
-                    <Text className='font-oswald-extralight color-white'>1:20 PM - Battery low</Text>
-                    <Text className='font-oswald-extralight color-white'>7:45 AM - Arrived at school</Text>
-                    <Text className='font-oswald-extralight color-white'>7:30 AM - Left home</Text>
-                </ScrollView>
+                {!alerts.length ? (
+                    <Text className='font-oswald-extralight text-white text-md'>No alerts</Text>
+                ) : (
+                    <FlatList
+                        data={alerts}
+                        renderItem={({item}) => {
+                            const time = getCurrentTime(item.time);
+                            return (
+                                <Text className='font-oswald-extralight text-white text-md'>{time} - {item.alert_body}</Text>
+                            )
+                        }}
+                    />
+                )}
             </View>
         </View>
     )

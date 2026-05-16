@@ -70,20 +70,23 @@ export default function ChildCard({name, profilePic, distance, speed, longitude,
                 </MapView>  
             </View>
             {/* Alerts */}
-            <View className='h-32 rounded-2xl mt-2'>
+            <View className='rounded-2xl mt-2'>
                 <Text className='text-xl color-tertiary font-staatliches'>Alerts</Text>
                 {!alerts.length ? (
                     <Text className='font-oswald-extralight text-white text-md'>No alerts</Text>
                 ) : (
-                    <FlatList
-                        data={alerts}
-                        renderItem={({item}) => {
-                            const time = getCurrentTime(item.time);
+                    <ScrollView
+                        style={{maxHeight: 84}}
+                        scrollEnabled={alerts.length > 4}
+                        nestedScrollEnabled={true}
+                    >
+                        {alerts.map((alert, index) => {
+                            const time = getCurrentTime(alert.time);
                             return (
-                                <Text className='font-oswald-extralight text-white text-md'>{time} - {item.alert_body}</Text>
+                                <Text key={index} className='font-oswald-extralight text-white text-md h-[21px]'>{time} - {alert.alert_body}</Text>
                             )
-                        }}
-                    />
+                        })}
+                    </ScrollView>
                 )}
             </View>
         </View>

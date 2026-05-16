@@ -24,7 +24,7 @@ router.get("/all-alerts/:parentId", (req, res) => {
         `
             SELECT pc.child_id, a.time, a.alert_body FROM alert a
             JOIN parent_child pc ON pc.child_id = a.child_id
-            WHERE pc.parent_id = ?
+            WHERE pc.parent_id = ? AND DATE(a.time) = CURDATE()
             ORDER BY a.time DESC
         `,
         [parentId],

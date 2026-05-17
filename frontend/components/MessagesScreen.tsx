@@ -114,6 +114,8 @@ const MessagesScreen = ({
         }
     }
 
+    const reversedMessages = [...messageList].reverse();
+
     return (
         <View className='flex-1 bg-secondary'> 
             {/* Conversation list */}
@@ -227,14 +229,19 @@ const MessagesScreen = ({
                                 <View className='w-full flex flex-1'>
                                     <FlatList
                                         inverted
-                                        data={[...messageList].reverse()}
+                                        data={reversedMessages}
                                         renderItem={({item, index}) => {
-                                            const messages = [...messageList].reverse();
-                                            const previousMessage = messages[index - 1];
+                                            const nextMessage = reversedMessages[index + 1];
+                                            if (nextMessage) {
+                                                console.log("next:",new Date(nextMessage.created_at).toDateString());
+                                                console.log("message date:",new Date(item.created_at).toDateString());
+                                            }
                                             const showDate = 
-                                                !previousMessage || 
-                                                new Date(previousMessage.created_at).toDateString() !==
+                                                !nextMessage || 
+                                                new Date(nextMessage.created_at).toDateString() !==
                                                 new Date(item.created_at).toDateString();
+
+                                            console.log("showDate:", showDate);
                                             return (
                                                 <View>
                                                     {showDate && (

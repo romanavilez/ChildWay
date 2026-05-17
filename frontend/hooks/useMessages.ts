@@ -47,12 +47,25 @@ export const useMessages = () => {
     const userType = useAuthStore((state) => state.userType);
 
     // Grab current time in 12 hour format
-    const getCurrentTime = (timestamp: string) => {
-        const time = new Date(timestamp).toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        });
+    const getDateTime = (timestamp: string) => {
+        let time;
+        const input = new Date(timestamp);
+        const today = new Date();
+        let yesterday = new Date();
+        yesterday.setDate(today.getDate() - 1);
+
+        if (input.toDateString() === today.toDateString()) {
+            time = new Date(timestamp).toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+        } else if (input.toDateString() === yesterday.toDateString()) {
+            time = "Yesterday";
+        } else {
+            time = input.toLocaleDateString();
+        }
+
         return time;
     }
 
@@ -393,7 +406,7 @@ export const useMessages = () => {
         zeroUnreadMessages,
         handleSendMessage,
         handleNewChat,
-        getCurrentTime,
+        getDateTime,
         getAllMessages, 
         getAllConversations,
     };

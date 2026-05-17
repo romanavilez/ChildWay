@@ -34,7 +34,7 @@ export default function messages() {
         setConversationPartner,
         newChatOpen,
         setNewChatOpen,
-        getCurrentTime,
+        getDateTime,
         zeroUnreadMessages,
         handleSendMessage,
         handleNewChat,
@@ -88,7 +88,7 @@ export default function messages() {
             handleNewChat={handleNewChat}
             getAllContacts={getAllContacts}
             getAllMessages={getAllMessages}
-            getCurrentTime={getCurrentTime}
+            getDateTime={getDateTime}
         />
     )
 }

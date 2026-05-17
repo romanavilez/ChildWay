@@ -56,7 +56,7 @@ type MessageScreenProps = {
     handleNewChat: (conversationPartner: string, profilePic: string) => void,
     getAllContacts: () => void,
     getAllMessages: (conversation_id: number) => void,
-    getCurrentTime: (timestamp: string) => string,
+    getDateTime: (timestamp: string) => string,
 };
 
 const MessagesScreen = ({
@@ -84,12 +84,35 @@ const MessagesScreen = ({
     handleNewChat,
     getAllContacts,
     getAllMessages,
-    getCurrentTime,
+    getDateTime,
 } : MessageScreenProps) => {
 
     useEffect(() => {
         getAllContacts();
-    }, [newChatOpen])
+    }, [newChatOpen]);
+
+    const getTime = (timestamp: string) => {
+        return new Date(timestamp).toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+    };
+
+    const getDate = (timestamp: string) => {
+        const inputDate = new Date(timestamp);
+        const today = new Date();
+        let yesterday = new Date();
+        yesterday.setDate(today.getDate() - 1);
+
+        if (inputDate.toDateString() === today.toDateString()) {
+            return "Today";
+        } else if (inputDate.toDateString() === yesterday.toDateString()) {
+            return "Yesterday";
+        } else {
+            return inputDate.toLocaleDateString();
+        }
+    }
 
     return (
         <View className='flex-1 bg-secondary'> 
@@ -127,7 +150,7 @@ const MessagesScreen = ({
                                         <View className='flex-row justify-between'>
                                             <Text className='font-staatliches text-white text-lg'>{messageData.user_id}</Text>
                                             <Text className='font-oswald-extralight' style={messageData.unread_messages > 0 ? {color: color} : {color: "#64748b"}}>
-                                                {time ? getCurrentTime(time) : ""}
+                                                {time ? getDateTime(time) : ""}
                                             </Text>
                                         </View>
                                         <View className="flex-row justify-between">
@@ -205,15 +228,25 @@ const MessagesScreen = ({
                                     <FlatList
                                         inverted
                                         data={[...messageList].reverse()}
-                                        renderItem={({item}) => {
-                                            // if (currentConversation !== item.conversation_id) return null;
+                                        renderItem={({item, index}) => {
+                                            const messages = [...messageList].reverse();
+                                            const previousMessage = messages[index - 1];
+                                            const showDate = 
+                                                !previousMessage || 
+                                                new Date(previousMessage.created_at).toDateString() !==
+                                                new Date(item.created_at).toDateString();
                                             return (
-                                                <ChatBlock 
-                                                    isSending={item.sender_id === userId} 
-                                                    message={item.message_text} 
-                                                    time={getCurrentTime(item.created_at)}
-                                                    blockColor={color}
-                                                />
+                                                <View>
+                                                    {showDate && (
+                                                        <Text className="flex self-center font-oswald-medium text-sm text-slate-400 my-2 bg-slate-800/40 p-2 rounded-xl">{getDate(item.created_at)}</Text>
+                                                    )}
+                                                    <ChatBlock 
+                                                        isSending={item.sender_id === userId} 
+                                                        message={item.message_text} 
+                                                        time={getTime(item.created_at)}
+                                                        blockColor={color}
+                                                    />
+                                                </View>
                                             )
                                         }}
                                     />

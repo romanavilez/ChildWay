@@ -47,7 +47,6 @@ router.get("/get-all-conversations/:userId", (req, res) => {
         [userId, userId],
         (err, results=[]) => {
             if (err) return res.status(500).json({error: err});
-            console.log("results:",results);
             return res.status(200).json({conversations: results});
         }
     );

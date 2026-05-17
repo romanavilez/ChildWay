@@ -58,10 +58,10 @@ const Index = () => {
     }
 
     // Update relevant fields when destination is selected from suggestions
-    const handleDestinationSelection = (address: string, mapboxId: string, sessionToken: string) => {
-        setDestination(address);
+    const handleDestinationSelection = (name: string, mapboxId: string, sessionToken: string) => {
+        setDestination(name);
         setSuggestions([]);
-        setSearch(address);
+        setSearch(name);
         retrievePlace(mapboxId, sessionToken);
     }
     
@@ -209,8 +209,8 @@ const Index = () => {
                             <FlatList
                                 data={suggestions}
                                 renderItem={({item}) => (
-                                    <TouchableOpacity className='h-15 pl-2' onPress={() => handleDestinationSelection(item.address, item.mapboxId, item.sessionToken)}>
-                                        <View className='absolute left-1 top-2 bottom-1 bg-primary w-[2]'/>
+                                    <TouchableOpacity className='h-15 pl-2' onPress={() => handleDestinationSelection(item.name, item.mapboxId, item.sessionToken)}>
+                                        <View className='absolute left-1 top-2 bottom-1 bg-primary w-[2] rounded-xl'/>
                                         <View className='flex-row justify-between'>
                                             <View className='flex-1'>
                                                 <Text className='text-white font-oswald-medium'>{item.name.toUpperCase()}</Text>
@@ -283,7 +283,7 @@ const Index = () => {
                     <View className='w-full overflow-hidden rounded-xl'>
                         <LinearGradient 
                             className='w-full'
-                            colors={['#F54B64', '#FE9A3D']}
+                            colors={['#10E5B2', '#72F38E']}
                             start={{ x: 0, y: 1 }}
                             end={{ x: 1, y: 0 }}
                         >

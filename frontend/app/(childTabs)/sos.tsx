@@ -12,18 +12,72 @@ const sos = () => {
     // use states
     const [notificationBody, setNotificationBody] = useState("");
 
-    const sendSosNotification = async () => {
+    const storeAlert = async (type: string, notificationBody: string) => {
+        const alertType = "sos";
+        let alertBody = "";
+        // set alert body
+        if (type === "sos") {
+            alertBody = notificationBody === "" ? "Sent an SOS ⚠️" : `SOS: ${notificationBody}`;
+        } else if (type === '911') {
+            alertBody = "Called 911 🚨"
+        }
+        // store alert
         try {
-            const title = `SOS Alert from ${childId}`;
+            const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/alerts/add-alert`, {
+                method: "POST",
+                headers: {"Content-Type" : "application/json"},
+                body: JSON.stringify({childId, alertType, alertBody})
+            });
+    
+            const data = await res.json();
+    
+            if (!res.ok) {
+                console.log("Failed to store alert:", data.error);
+            } 
+        } catch (error) {
+            console.log("Failed to store alert:", error);
+        }
+    }
+
+    const sendAlertSosNotification = async () => {
+        try {
+            const title = `⚠️ SOS Alert from ${childId}`;
             const body = notificationBody === "" ? "Tap to view their location." : notificationBody;
             const data = {sender: childId, type: "sos"}
+            // store alert before sending notification
+            storeAlert("sos", notificationBody);
+            // send notification
             const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/pushTokens/send-sos`, {
                 method: "POST",
                 headers: {"Content-Type" : "application/json"},
                 body: JSON.stringify({title, body, data})
             });
+
+            const data_ = await res.json();
     
-            if (res.ok) console.log("message sent");
+            if (!res.ok) console.log("Error sending alert notification:", data_.error);
+        } catch (error) {
+            console.log("Couldn't send notification:", error);
+        }
+    }
+
+    const send911AlertNotification = async () => {
+        try {
+            const title = `${childId} called 911 🚨`;
+            const body = "Tap to view their location.";
+            const data = {sender: childId, type: "sos"}
+            // store alert before sending notification
+            storeAlert("911", notificationBody);
+            // send notification
+            const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/pushTokens/send-sos`, {
+                method: "POST",
+                headers: {"Content-Type" : "application/json"},
+                body: JSON.stringify({title, body, data})
+            });
+
+            const data_ = await res.json();
+    
+            if (!res.ok) console.log("Error sending 911 notification:", data_.error);
         } catch (error) {
             console.log("Couldn't send notification:", error);
         }
@@ -46,7 +100,7 @@ const sos = () => {
                     {/* Alert parents button */}
                     <TouchableOpacity 
                         className='flex justify-center items-center h-2/5 rounded-t-2xl overflow-hidden' 
-                        onPress={() => {sendSosNotification(); setNotificationBody("")}}
+                        onPress={() => {sendAlertSosNotification(); setNotificationBody("")}}
                     >
                         <LinearGradient 
                             className={`absolute w-full h-full`}
@@ -64,14 +118,14 @@ const sos = () => {
                             placeholder='MESSAGE...'
                             textAlign='center'
                         />
-                        <TouchableOpacity className='absolute right-2' onPress={() => {sendSosNotification(); setNotificationBody("")}}>
+                        <TouchableOpacity className='absolute right-2' onPress={() => {sendAlertSosNotification(); setNotificationBody("")}}>
                             <Image source={require('@/assets/icons/send.png')} className='h-7 w-7'/>
                         </TouchableOpacity>
                     </View>
                     {/* Call 911 button */}
                     <TouchableOpacity 
                         className='flex justify-center items-center h-1/2 rounded-2xl mt-4 overflow-hidden'
-                        onPress={call911}
+                        onPress={() => {call911(); send911AlertNotification()}}
                     >
                         <LinearGradient 
                             className='absolute w-full h-full'

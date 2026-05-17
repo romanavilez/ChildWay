@@ -4,12 +4,12 @@ import {db} from "../lib/db.js"
 const router = express.Router();
 
 router.post("/add-alert", (req, res) => {
-    const {childId, type, body} = req.body;
-    if (!childId || !type || !body) return res.status(400).json({error: "Mising alert creation fields"});
+    const {childId, alertType, alertBody} = req.body;
+    if (!childId || !alertType || !alertBody) return res.status(400).json({error: "Missing alert creation fields"});
 
     db.query(
         "INSERT INTO alert(child_id, alert_type, alert_body) VALUES(?,?,?)",
-        [childId, type, body],
+        [childId, alertType, alertBody],
         (err, results) => {
             if (err) return res.status(500).json({error: err});
             return res.status(200).json({success: true});

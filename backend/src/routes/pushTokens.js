@@ -27,8 +27,22 @@ router.post("/store-push", (req, res) => {
 });
 
 router.post("/send-message", (req, res) => {
-    const {recipient, title, body, data} = req.body;
-    if (!recipient || !title || !body || !data) return res.status(400).json({error: "Missing required notification fields"});
+    const {recipient, conversationId, title, body, data} = req.body;
+    if (!recipient || !conversationId || !title || !body || !data) return res.status(400).json({error: "Missing required notification fields"});
+
+    const io = req.app.get("io");
+    // get all scokets in room
+    const roomName = `message:${conversationId}`;
+    const room = io.sockets.adapter.rooms.get(roomName);
+    // check if recipient is connected to this room
+    const recipientInRoom = room && [...room].some((socketId) => {
+        const socket = io.sockets.sockets.get(socketId);
+        return socket?.user === recipient;
+    });
+    // Don't send notification if recipient in room
+    if (recipientInRoom) {
+        return res.status(200).json({success: true, skipped: true})
+    }
 
     db.query(
         "SELECT token FROM push_token WHERE user_id = ?",
@@ -37,7 +51,7 @@ router.post("/send-message", (req, res) => {
             if (err) return res.status(500).json({error: "Could not grab push token"});
             if (!results.length) return res.status(404).json({error: `${userId} does not have a registered push token`});
             await sendPushNotification(results.map((t) => t.token), {title, body, data});
-            return res.status(200).json({success: true});
+            return res.status(200).json({success: true, skipped: false});
         }
     )
 })

@@ -56,7 +56,7 @@ router.post("/send-message", (req, res) => {
     )
 })
 
-router.post("/send-sos", (req, res) => {
+router.post("/send-notification", (req, res) => {
     const {title, body, data} = req.body;
     if (!title || !body || !data) return res.status(400).json({error: "Missing required notification fields"});
 

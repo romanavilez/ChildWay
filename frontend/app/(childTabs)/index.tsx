@@ -1,13 +1,12 @@
 import { View, Text, TextInput, TouchableOpacity, Image, Alert, FlatList, Linking } from 'react-native'
 import React, { useEffect, useState, useRef, Ref } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import 'react-native-get-random-values'
 import Mapbox, {Camera, LineLayer, LocationPuck, MapView, ShapeSource, MarkerView, Images} from '@rnmapbox/maps'
-import {Feature, LineString} from "geojson"
 import {getCurrentPositionAsync, LocationObjectCoords} from 'expo-location'
 import {LinearGradient} from 'expo-linear-gradient'
 import RadioButton from '@/components/RadioButton'
 import { v4 as uuidv4} from 'uuid'
+import { useAuthStore } from '@/store/auth.store'
 import '../global.css'
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN!);
@@ -41,6 +40,9 @@ const Index = () => {
     const [destCoordinates, setDestCoordinates] = useState<LocationObjectCoords | null>(null);
     const [route, setRoute] = useState<any>(null);
     const [searchFocus, setSearchFocus] = useState(false);
+
+    // grab user id
+    const childId = useAuthStore((state) => state.username);
 
     // Get route only when destination coordinates are available
     useEffect(() => {
@@ -155,6 +157,56 @@ const Index = () => {
         } catch (error) {
             console.log("Error opening Google Maps: ", error);
         }
+    }
+
+    // When child opens google maps, store an alert
+    const storeAlert = async () => {
+        const alertType = "geofence";
+        const alertBody = `Navigated to ${destination} 📍`;
+
+        // store alert
+        try {
+            const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/alerts/add-alert`, {
+                method: "POST",
+                headers: {"Content-Type" : "application/json"},
+                body: JSON.stringify({childId, alertType, alertBody})
+            });
+    
+            const data = await res.json();
+    
+            if (!res.ok) {
+                console.log("Failed to store alert:", data.error);
+            } 
+        } catch (error) {
+            console.log("Failed to store alert:", error);
+        }
+    };
+
+    // send navigation notification
+    const sendNavigationNotification = async () => {
+        try {
+            const title = `${childId} opened navigation 🗺️`;
+            const body = "Tap to see where they are heading.";
+            const data = {sender: childId, type: "navigation"}
+            // send notification
+            const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/pushTokens/send-notification`, {
+                method: "POST",
+                headers: {"Content-Type" : "application/json"},
+                body: JSON.stringify({title, body, data})
+            });
+
+            const data_ = await res.json();
+    
+            if (!res.ok) console.log("Error sending alert notification:", data_.error);
+        } catch (error) {
+            console.log("Couldn't send notification:", error);
+        }
+    }
+
+    const handleNavigation = () => {
+        openGoogleMaps();
+        storeAlert();
+        sendNavigationNotification();
     }
 
     return (
@@ -287,7 +339,7 @@ const Index = () => {
                             start={{ x: 0, y: 1 }}
                             end={{ x: 1, y: 0 }}
                         >
-                            <TouchableOpacity className=' flex-row h-14 w-full items-center justify-center rounded-xl' onPress={openGoogleMaps}>
+                            <TouchableOpacity className=' flex-row h-14 w-full items-center justify-center rounded-xl' onPress={handleNavigation}>
                                 <Text className='text-white font-staatliches text-3xl'>Go </Text>
                                 <Image source={require('@/assets/icons/arrow-circle-right.png')} resizeMode='contain' className='h-7 w-7'/>
                             </TouchableOpacity>

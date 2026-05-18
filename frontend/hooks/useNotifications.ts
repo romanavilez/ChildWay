@@ -55,16 +55,12 @@ export const useNotifications = (userId:string | null) => {
 
         });
 
-        // notification sent
-        // notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-        //     console.log("notification:",notification);
-        // });
-
         // user clicks on notification
         const handleNotification = (response : any) => {
             const data = response.notification.request.content.data; 
-            if (data.type === 'sos') router.replace("/children");
-            else if (data.type === 'message') {
+            if (data.type === 'sos' || data.type === 'geofence' || data.type === 'navigation') { 
+                router.replace("/children");
+            } else if (data.type === 'message') {
                 if (data.recipientType === 'child') {
                     router.replace("/parents");
                 } else if (data.recipientType === 'parent') {

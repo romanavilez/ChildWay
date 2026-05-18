@@ -47,7 +47,7 @@ const sos = () => {
             // store alert before sending notification
             storeAlert("sos", notificationBody);
             // send notification
-            const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/pushTokens/send-sos`, {
+            const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/pushTokens/send-notification`, {
                 method: "POST",
                 headers: {"Content-Type" : "application/json"},
                 body: JSON.stringify({title, body, data})
@@ -69,7 +69,7 @@ const sos = () => {
             // store alert before sending notification
             storeAlert("911", notificationBody);
             // send notification
-            const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/pushTokens/send-sos`, {
+            const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/pushTokens/send-notification`, {
                 method: "POST",
                 headers: {"Content-Type" : "application/json"},
                 body: JSON.stringify({title, body, data})

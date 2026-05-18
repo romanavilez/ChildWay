@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, TextInput, Image } from 'react-native'
+import { View, Text, TouchableOpacity, TextInput, Image, Modal } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -11,6 +11,8 @@ const sos = () => {
 
     // use states
     const [notificationBody, setNotificationBody] = useState("");
+    const [sosConfirmationOpen, setSosConfirmationOpen] = useState(false);
+    const [emergencyConfirmationOpen, setEmergencyConfirmationOpen] = useState(false);
 
     const storeAlert = async (type: string, notificationBody: string) => {
         const alertType = "sos";
@@ -84,7 +86,7 @@ const sos = () => {
     }
 
     const call911 = async () => {
-        const phoneNumber = "4255337117";
+        const phoneNumber = "1234567890";
 
         try {
             await Linking.openURL(`tel:${phoneNumber}`);
@@ -100,7 +102,7 @@ const sos = () => {
                     {/* Alert parents button */}
                     <TouchableOpacity 
                         className='flex justify-center items-center h-2/5 rounded-t-2xl overflow-hidden' 
-                        onPress={() => {sendAlertSosNotification(); setNotificationBody("")}}
+                        onPress={() => setSosConfirmationOpen(true)}
                     >
                         <LinearGradient 
                             className={`absolute w-full h-full`}
@@ -118,14 +120,14 @@ const sos = () => {
                             placeholder='MESSAGE...'
                             textAlign='center'
                         />
-                        <TouchableOpacity className='absolute right-2' onPress={() => {sendAlertSosNotification(); setNotificationBody("")}}>
+                        <TouchableOpacity className='absolute right-2' onPress={() => setSosConfirmationOpen(true)}>
                             <Image source={require('@/assets/icons/send.png')} className='h-7 w-7'/>
                         </TouchableOpacity>
                     </View>
                     {/* Call 911 button */}
                     <TouchableOpacity 
                         className='flex justify-center items-center h-1/2 rounded-2xl mt-4 overflow-hidden'
-                        onPress={() => {call911(); send911AlertNotification()}}
+                        onPress={() => setEmergencyConfirmationOpen(true)}
                     >
                         <LinearGradient 
                             className='absolute w-full h-full'
@@ -137,6 +139,64 @@ const sos = () => {
                     </TouchableOpacity>
                 </View>
             </View>
+            {/* Alert parents confirmation */}
+            <Modal
+                visible={sosConfirmationOpen}
+                transparent
+                animationType='fade'
+            >
+                <SafeAreaView className='flex-1 bg-secondary/90'>    
+                    <View className='flex justify-center items-center w-full h-full'>
+                        <View className='flex justify-center items-center w-[85%] h-[30%] bg-secondary-two rounded-2xl border-2 border-white'>
+                            <Text className='font-staatliches text-white text-3xl'>Send SOS alert?</Text>
+                            <Text className='font-staatliches text-slate-300 text-xl'>Your parent will be notified immediately.</Text>
+                            <View className='flex-row gap-2 mt-10'>
+                                <TouchableOpacity 
+                                    className='flex justify-center items-center p-2 rounded-xl bg-tertiary w-1/4'
+                                    onPress={() => setSosConfirmationOpen(false)}
+                                >
+                                    <Text className='font-staatliches text-white text-xl'>Cancel</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity 
+                                    className='flex justify-center items-center p-2 rounded-xl bg-primary w-1/4'
+                                    onPress={() => {setSosConfirmationOpen(false); sendAlertSosNotification(); setNotificationBody("")}}
+                                >
+                                    <Text className='font-staatliches text-white text-xl'>Send</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </SafeAreaView>
+            </Modal>
+            {/* Call 911 confirmation */}
+            <Modal
+                visible={emergencyConfirmationOpen}
+                transparent
+                animationType='fade'
+            >
+                <SafeAreaView className='flex-1 bg-secondary/90'>    
+                    <View className='flex justify-center items-center w-full h-full'>
+                        <View className='flex justify-center items-center w-[85%] h-[30%] bg-secondary-two rounded-2xl border-2 border-white'>
+                            <Text className='font-staatliches text-white text-3xl'>Emergency call</Text>
+                            <Text className='font-staatliches text-slate-300 text-xl'>Are you sure you want to call 911?</Text>
+                            <View className='flex-row gap-2 mt-10'>
+                                <TouchableOpacity 
+                                    className='flex justify-center items-center p-2 rounded-xl bg-tertiary w-1/4'
+                                    onPress={() => setEmergencyConfirmationOpen(false)}
+                                >
+                                    <Text className='font-staatliches text-white text-xl'>Cancel</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity 
+                                    className='flex justify-center items-center p-2 rounded-xl bg-primary w-1/4'
+                                    onPress={() => {setEmergencyConfirmationOpen(false); call911(); send911AlertNotification()}}
+                                >
+                                    <Text className='font-staatliches text-white text-xl'>Call</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </SafeAreaView>
+            </Modal>
         </View>
     )
 }

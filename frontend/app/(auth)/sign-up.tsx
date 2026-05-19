@@ -12,19 +12,21 @@ const SignUp = () => {
     const [role, setRole] = useState("");
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [username, setUsername] = useState("");
+    const [name, setName] = useState("")
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPass, setConfirmPass] = useState("");
 
     // Load icons
     const emailIcon = require('@/assets/icons/envelope.png');
-    const nameIcon = require('@/assets/icons/last-name.png');
+    const usernameIcon = require('@/assets/icons/username.png');
+    const nameIcon = require('@/assets/icons/name.png')
 
     const userTypes = ['parent', 'child'];
 
     const handleSignUp = async () => {
         // Missing fields
-        if (!username || !email || !password || !role) {
+        if (!username || !name || !email || !password || !role) {
             Alert.alert("Missing required fields", "Make sure to fill in all fields.");
             return;
         }
@@ -46,7 +48,7 @@ const SignUp = () => {
             const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/users/signup`, {
                 method: "POST",
                 headers: {"Content-Type" : "application/json"},
-                body: JSON.stringify({username, email, password, role})
+                body: JSON.stringify({username, name, email, password, role})
             })
 
             const data = await res.json();
@@ -111,8 +113,9 @@ const SignUp = () => {
                             )}                    
                         </View>
                     </View>
-                    {/* Sign up fields */}
-                    <InputField placeholder='Username' icon={nameIcon} value={username} onChangeText={setUsername} tint='#FF6F52'/>
+                    {/* Sign up fields */}-
+                    <InputField placeholder='Username' icon={usernameIcon} value={username} onChangeText={setUsername} tint='#FF6F52'/>
+                    <InputField placeholder='Name' icon={nameIcon} value={name} onChangeText={setName} tint='#FF6F52'/>
                     <InputField placeholder='Email' icon={emailIcon} value={email} onChangeText={setEmail} tint='#FF6F52'/>
                     <PasswordField placeholder='Password' value={password} onChangeText={setPassword} tint='#FF6F52'/>
                     <PasswordField placeholder='Confirm Password' value={confirmPass} onChangeText={setConfirmPass} tint='#FF6F52'/>

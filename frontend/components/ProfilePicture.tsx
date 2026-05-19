@@ -3,8 +3,9 @@ import React, { useEffect, useState } from 'react'
 import * as ImagePicker from 'expo-image-picker'
 import { useAuthStore } from '@/store/auth.store'
 import profile from '@/app/(parentTabs)/profile'
+import { LinearGradient } from 'expo-linear-gradient'
 
-const ProfilePicture = () => {
+const ProfilePicture = ({color} : {color: string}) => {
     // grab user
     const userId = useAuthStore((state) => state.username);
 
@@ -79,9 +80,9 @@ const ProfilePicture = () => {
     }, []);
 
     return (
-        <View className='flex items-center justify-center mt-20'>
-            <View className='relative flex items-center justify-center rounded-3xl w-40 h-40 bg-white'>
-                <View className='flex justify-center items-center rounded-3xl w-40 h-40 overflow-hidden border-2 border-white'>
+        <View className='flex items-center justify-center h-[25%]'>
+            <View className='relative flex items-center justify-center rounded-full w-40 h-40'>
+                <View className='flex justify-center items-center rounded-full w-40 h-40 overflow-hidden border-4 border-white'>
                     {image ? (
                         <Image source={{uri: image}} resizeMode='contain' className='w-40 h-40'/>
                     ) : (
@@ -89,18 +90,17 @@ const ProfilePicture = () => {
                     )}
                 </View>
                 <TouchableOpacity 
-                    className='absolute -right-2 bottom-0 flex justify-center items-center bg-slate-700 rounded-full w-8 h-8'
+                    className='absolute right-3 bottom-2 flex justify-center items-center bg-white rounded-full w-8 h-8'
                     onPress={pickImage}
                 >
                     <Image 
                         source={require("@/assets/icons/pencil.png")} 
                         resizeMode='contain' 
                         className='w-5 h-5' 
-                        style={{tintColor: 'white'}}
+                        style={{tintColor: color}}
                     />
                 </TouchableOpacity>
-            </View>
-            <Text className='text-white font-staatliches mt-2 text-lg'>{userId}</Text>
+            </View>            
         </View>
     )
 }

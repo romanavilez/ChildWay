@@ -3,13 +3,16 @@ import React, { useEffect, useState } from 'react'
 import { router } from 'expo-router'
 import { useAuthStore } from '@/store/auth.store'
 import { Camera, CameraView, BarcodeScanningResult} from 'expo-camera'
-import * as Notifications from "expo-notifications"
 import ProfilePicture from '@/components/ProfilePicture'
+import ProfileField from '@/components/ProfileField'
 
 export default function profile() {
     // Auth store
     const logout = useAuthStore((state) => state.logout);
     const parentId = useAuthStore((state) => state.username);
+    const name = useAuthStore((state) => state.name);
+    const email = useAuthStore((state) => state.email);
+    const role = useAuthStore((state) => state.userType);
 
     // Use states
     const [scannerVisible, setScannerVisible] = useState(false);
@@ -80,44 +83,37 @@ export default function profile() {
         setScanned(false);
     }
 
-    const sendNotification = async () => {
-        try {
-            const title = "Test Message";
-            const body = "This message is being sent to ravilez";
-            const data = {type: "test"}
-            const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/pushTokens/send-message/ravilez`, {
-                method: "POST",
-                headers: {"Content-Type" : "application/json"},
-                body: JSON.stringify({title, body, data})
-            });
-    
-            if (res.ok) console.log("message sent");
-        } catch (error) {
-            console.log("Couldn't send notification:", error);
-        }
-    }
-
     return (
-        <View className='flex-1 bg-secondary'>
-            <ProfilePicture />
-            <View className='flex flex-1 px-2 items-center justify-center'>
+        <View className='flex-1 items-center justify-center bg-secondary'>
+            <ProfilePicture color='#FF6F52'/>
+            {/* Personal details */}
+            <Text className='flex self-start font-staatliches text-slate-300 ml-5 text-xl'>Personal Details</Text>
+            <View className='flex items-center w-full'>
+                <ProfileField type='name' value={name!} color='#FF6F52'/>
+                <ProfileField type='username' value={parentId!} color='#FF6F52'/>
+                <ProfileField type='email' value={email!} color='#FF6F52'/>
+                <ProfileField type='role' value={role!} color='#FF6F52'/>
+            </View>
+            <View className='flex justify-center mt-5 w-[90%]'>
+                <View className='text-left w-[90%]'>
+                    <Text className='font-staatliches text-slate-300 text-xl'>Add a Child</Text>
+                </View>
+                {/* Scan QR code button */}
                 <TouchableOpacity 
-                    className='flex justify-center items-center w-5/6 h-20 rounded-3xl bg-tertiary-two'
+                    className='flex-row justify-center items-center w-40 rounded-3xl gap-2'
                     onPress={() => setScannerVisible(true)}
                 >
-                    <Text className='font-staatliches text-2xl'>Scan QR Code</Text>
+                    <Image source={require('@/assets/icons/camera.png')} resizeMode='contain' className='h-8 w-8' style={{tintColor: '#FF6F52'}}/>
+                    <Text className='font-staatliches text-2xl text-tertiary'>Scan QR Code</Text>
                 </TouchableOpacity>
+            </View>
+            <View className='flex-1 items-center justify-end mb-2 w-full'>
+                {/* Logout button */}
                 <TouchableOpacity 
                     className='flex items-center justify-center bg-tertiary w-5/6 h-20 rounded-3xl mt-2'
                     onPress={() => {logout(); router.replace('/(auth)/login')}}
                 >
                     <Text className='font-staatliches text-2xl'>Log out</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                    className='flex items-center justify-center bg-white w-5/6 h-20 rounded-3xl mt-2'
-                    onPress={sendNotification}
-                >
-                    <Text className='font-staatliches text-2xl'>Send Notification</Text>
                 </TouchableOpacity>
             </View>
             {/* QR code scanner */}
@@ -126,7 +122,7 @@ export default function profile() {
                 transparent
                 animationType='fade'
             >
-                <View className='flex justify-center items-center w-full h-full'>
+                <View className='flex justify-center items-center w-full h-full bg-secondary/80'>
                     <View className='w-[90%] h-1/2 bg-secondary-two p-2 rounded-2xl border-4 border-tertiary-two' style={{overflow:'hidden'}}>
                         <View className='flex-row justify-between w-full'>
                             <Text className='font-staatliches text-3xl text-tertiary-two'>Scan Code</Text>
@@ -155,7 +151,7 @@ export default function profile() {
                 transparent
                 animationType='fade'
             >
-                <View className='flex h-full w-full justify-center items-center'>
+                <View className='flex h-full w-full justify-center items-center bg-secondary/80'>
                     <View className='flex justify-center w-[90%] h-[30%] bg-secondary-two p-2 rounded-2xl border-4 border-white'>
                         <View className='flex justify-center items-center'>
                             <Text className='font-staatliches text-white text-3xl'>Confirm child connection</Text>

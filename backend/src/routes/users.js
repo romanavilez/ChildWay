@@ -28,8 +28,12 @@ router.post("/login", (req, res) => {
             // verify if password is correct
             const passwordMatch = await bcrypt.compare(password, results[0].password_hash);
             if (passwordMatch) {
-                console.log()
-                return res.status(200).json({message: "User authenticated succesfully", role: results[0].role});
+                return res.status(200).json({
+                    message: "User authenticated succesfully", 
+                    name: results[0].name,
+                    email: results[0].email,
+                    role: results[0].role
+                });
             } else {
                 return res.status(401).json({error: "We couldn't log you in. Please check your credentials and try again."});
             }
@@ -40,8 +44,8 @@ router.post("/login", (req, res) => {
 // Sign up user
 router.post("/signup", async (req, res) => {
     // check for required fields
-    const {username, email, password, role} = req.body;
-    if (!username || !email || !password || !role) {
+    const {username, name, email, password, role} = req.body;
+    if (!username || !name || !email || !password || !role) {
         return res.status(400).json({error: "missing required fields"});
     }
 
@@ -50,8 +54,8 @@ router.post("/signup", async (req, res) => {
 
     // add new user to user table
     db.query(
-        "INSERT INTO user(username, email, password_hash, role) VALUES(?,?,?,?)",
-        [username, email, passwordHash, role],
+        "INSERT INTO user(username, name, email, password_hash, role) VALUES(?,?,?,?,?)",
+        [username, name, email, passwordHash, role],
         (err, result) => {
             if (err) {
                 // duplicate entry

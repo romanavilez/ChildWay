@@ -21,6 +21,8 @@ const Login = () => {
     // state functions
     const login = useAuthStore((state) => state.login);
     const setRole = useAuthStore((state) => state.setRole); 
+    const setName = useAuthStore((state) => state.setName);
+    const setEmail = useAuthStore((state) => state.setEmail);
     
     // Verify user exists in database and log them in
     const handleLogin = async () => {
@@ -39,11 +41,15 @@ const Login = () => {
             const data = await res.json();
             
             if (res.ok) {
-                // grab user role
+                // grab user info
                 const role = data.role;
+                const name = data.name;
+                const email = data.email;
                 // Update auth store
                 login(username, "");
                 setRole(role);
+                setName(name);
+                setEmail(email);
                 // route user to role-based interface
                 if (role === "parent") router.replace('../(parentTabs)');
                 else if (role === "child") router.replace('../(childTabs)');

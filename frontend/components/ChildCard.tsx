@@ -1,7 +1,8 @@
-import { View, Text, ScrollView, Image, FlatList } from 'react-native'
+import { View, Text, ScrollView, Image, FlatList, TouchableOpacity, Linking } from 'react-native'
 import React from 'react'
 import { MapView, Camera, MarkerView, Images } from '@rnmapbox/maps'
-
+import { LinearGradient } from 'expo-linear-gradient'
+import { getCurrentPositionAsync } from 'expo-location'
 
 type alertProps = {
     time: string, 
@@ -19,7 +20,30 @@ type ChildCardProps = {
     setScroll: React.Dispatch<React.SetStateAction<boolean>>
 }
 
+
 export default function ChildCard({name, profilePic, distance, speed, longitude, latitude, alerts, setScroll} : ChildCardProps) {
+    // grab parent's location
+    const getLocation = async () => {
+        const loc = await getCurrentPositionAsync();
+        return {parentLat: loc.coords.latitude, parentLng: loc.coords.longitude};
+    }
+    
+    // Opens Google Maps and navigates user to destination with specified travel mode
+    const navigateToChild = async () => {
+        // Can't navigate without child's coordinates
+        if (!longitude || !latitude) return;
+        const {parentLat, parentLng} = await getLocation();
+        const url = `https://www.google.com/maps/dir/?api=1` +
+                    `&origin=${latitude},${longitude}` +
+                    `&destination=${parentLat},${parentLng}`;
+
+        try {
+            Linking.openURL(url);
+        } catch (error) {
+            console.log("Error opening Google Maps: ", error);
+        }
+    }
+
     // Grab current time in 12 hour format
     const getCurrentTime = (timestamp: string) => {
         const time = new Date(timestamp).toLocaleTimeString('en-US', {
@@ -31,7 +55,7 @@ export default function ChildCard({name, profilePic, distance, speed, longitude,
     }
 
     return (
-        <View className='w-full rounded-2xl p-3 bg-slate-800 mb-4'>
+        <View className='w-full rounded-2xl p-3 mb-4 border-[1px] border-white'>
             {/* Child Info */}
             <View className='flex-row justify-between items-center'>
                 <Text className='text-2xl color-white font-staatliches'>{name}</Text>
@@ -89,6 +113,19 @@ export default function ChildCard({name, profilePic, distance, speed, longitude,
                     </ScrollView>
                 )}
             </View>
+            {/* Navigation */}
+            <TouchableOpacity className='flex-row w-full bg-secondary rounded-2xl h-10 mt-2' onPress={navigateToChild}>
+                <LinearGradient 
+                    className='flex-row justify-center items-center w-full h-10 gap-2'
+                    style={{borderRadius: 16}}
+                    colors={['#FF6F52', '#FE9A3D']}
+                    start={{ x: 0, y: 1 }}
+                    end={{ x: 1, y: 0 }}
+                >
+                    <Text className='font-staatliches text-white text-2xl'>Go</Text>
+                    <Image source={require('@/assets/icons/arrow-circle-right.png')} resizeMode='contain' className='h-6 w-6'/>
+                </LinearGradient>
+            </TouchableOpacity>
         </View>
     )
 }

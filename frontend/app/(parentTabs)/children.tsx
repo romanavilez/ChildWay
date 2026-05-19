@@ -152,7 +152,7 @@ export default function children() {
 
     return (
         <View className='flex-1 bg-secondary p-2'>
-            <View className='flex bg-secondary-two rounded-2xl p-2'>
+            <View className='flex bg-secondary-two rounded-2xl p-2 pb-0'>
                 <FlatList
                     data={children}
                     renderItem={({item}) => {

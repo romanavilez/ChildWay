@@ -3,10 +3,29 @@ import {db} from "../lib/db.js"
 import bcrypt from 'bcrypt'
 import upload from '../lib/multer.js'
 import cloudinary from '../lib/cloudinary.js'
+import jwt from 'jsonwebtoken'
+import dotenv from "dotenv"
+
+dotenv.config();
 
 const router = express.Router();
 
 // GET user by username
+router.get("/user/:userId", (req, res) => {
+    const {userId} = req.params;
+
+    db.query(
+        "SELECT * FROM user WHERE username = ?",
+        [userId],
+        (err, results=[]) => {
+            if (err) return res.status(500).json({error: err});
+            if (!results.length) return res.status(200).json({success: false});
+            return res.status(200).json({success: true, user: results[0]})
+        }
+    )
+})
+
+// Login user
 router.post("/login", (req, res) => {
     // check for required fields
     const {username, password} = req.body;
@@ -28,11 +47,26 @@ router.post("/login", (req, res) => {
             // verify if password is correct
             const passwordMatch = await bcrypt.compare(password, results[0].password_hash);
             if (passwordMatch) {
+                // Generate access token
+                const accessToken = jwt.sign(
+                    { userId: username, role: results[0].role },
+                    process.env.ACCESS_SECRET,
+                    { expiresIn: "15m" }
+                );
+                // Generate refresh token
+                const refreshToken = jwt.sign(
+                    { userId: username, role: results[0].role }, 
+                    process.env.REFRESH_SECRET,
+                    { expiresIn: "30d" }
+                );
+                // Send data
                 return res.status(200).json({
                     message: "User authenticated succesfully", 
                     name: results[0].name,
                     email: results[0].email,
-                    role: results[0].role
+                    role: results[0].role,
+                    accessToken,
+                    refreshToken
                 });
             } else {
                 return res.status(401).json({error: "We couldn't log you in. Please check your credentials and try again."});

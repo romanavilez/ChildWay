@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/auth.store'
 import QRCode from 'react-native-qrcode-svg'
 import ProfilePicture from '@/components/ProfilePicture'
 import ProfileField from '@/components/ProfileField'
+import * as SecureStore from 'expo-secure-store'
 
 const profile = () => {
     // Auth store
@@ -18,6 +19,17 @@ const profile = () => {
     const [showQr, setShowQr] = useState(false);
     const [linkToken, setLinkToken] = useState("");
     const [expiresAt, setExpiresAt] = useState();
+
+    // logout
+    const closeSession = async () => {
+        // update auth state
+        logout(); 
+        // delete auth tokens
+        await SecureStore.deleteItemAsync("accessToken");
+        await SecureStore.deleteItemAsync("refreshToken");
+        // navigate to login
+        router.replace('/(auth)/login')
+    }
 
     // Create token
     const createToken = async () => {
@@ -71,7 +83,7 @@ const profile = () => {
                 {/* Logout button */}
                 <TouchableOpacity 
                     className='flex items-center justify-center bg-primary w-5/6 h-20 rounded-3xl mt-2'
-                    onPress={() => {logout(); router.replace('/(auth)/login')}}
+                    onPress={() => {closeSession()}}
                 >
                     <Text className='font-staatliches text-2xl'>Log out</Text>
                 </TouchableOpacity>

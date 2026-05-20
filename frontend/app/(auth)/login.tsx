@@ -6,8 +6,8 @@ import { router } from 'expo-router';
 import PasswordField from '@/components/PasswordField';
 import InputField from '@/components/InputField';
 import FormButton from '@/components/FormButton';
-
 import { useAuthStore } from '@/store/auth.store';
+import * as SecureStore from 'expo-secure-store'
 
 
 const Login = () => {
@@ -24,6 +24,20 @@ const Login = () => {
     const setName = useAuthStore((state) => state.setName);
     const setEmail = useAuthStore((state) => state.setEmail);
     
+    // Update all fields in auth store
+    const updateAuth = (username: string, role: string, name: string, email: string) => {
+        login(username, "");
+        setRole(role);
+        setName(name);
+        setEmail(email);
+    }
+
+    // Store access and refresh tokens
+    const storeAuthTokens = async (accessToken: string, refreshToken: string) => {
+        await SecureStore.setItemAsync("accessToken", accessToken);
+        await SecureStore.setItemAsync("refreshToken", refreshToken);
+    }
+
     // Verify user exists in database and log them in
     const handleLogin = async () => {
         // Missing username or password
@@ -42,14 +56,11 @@ const Login = () => {
             
             if (res.ok) {
                 // grab user info
-                const role = data.role;
-                const name = data.name;
-                const email = data.email;
+                const role = data.role, name = data.name, email = data.email;
                 // Update auth store
-                login(username, "");
-                setRole(role);
-                setName(name);
-                setEmail(email);
+                updateAuth(username, role, name, email);
+                // Store auth tokens
+                storeAuthTokens(data.accessToken, data.refreshToken);
                 // route user to role-based interface
                 if (role === "parent") router.replace('../(parentTabs)');
                 else if (role === "child") router.replace('../(childTabs)');

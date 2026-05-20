@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/auth.store'
 import { Camera, CameraView, BarcodeScanningResult} from 'expo-camera'
 import ProfilePicture from '@/components/ProfilePicture'
 import ProfileField from '@/components/ProfileField'
+import * as SecureStore from 'expo-secure-store'
 
 export default function profile() {
     // Auth store
@@ -29,7 +30,18 @@ export default function profile() {
             const {status} = await Camera.requestCameraPermissionsAsync();
             setHasCameraPermission(status === 'granted');
         })();
-    }, [scannerVisible])
+    }, [scannerVisible]);
+
+    // logout
+    const closeSession = async () => {
+        // update auth state
+        logout(); 
+        // delete auth tokens
+        await SecureStore.deleteItemAsync("accessToken");
+        await SecureStore.deleteItemAsync("refreshToken");
+        // navigate to login
+        router.replace('/(auth)/login')
+    }
 
     const handleBarcodeScanned = async ({data:tokenId}:BarcodeScanningResult) => {
         if (scanned) return;
@@ -111,7 +123,7 @@ export default function profile() {
                 {/* Logout button */}
                 <TouchableOpacity 
                     className='flex items-center justify-center bg-tertiary w-5/6 h-20 rounded-3xl mt-2'
-                    onPress={() => {logout(); router.replace('/(auth)/login')}}
+                    onPress={() => {closeSession()}}
                 >
                     <Text className='font-staatliches text-2xl'>Log out</Text>
                 </TouchableOpacity>

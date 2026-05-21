@@ -45,7 +45,7 @@ const SignUp = () => {
         }
 
         try {
-            const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/users/signup`, {
+            const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/users/signup`, {
                 method: "POST",
                 headers: {"Content-Type" : "application/json"},
                 body: JSON.stringify({username, name, email, password, role})

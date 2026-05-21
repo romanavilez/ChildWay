@@ -27,7 +27,7 @@ export default function Index() {
     const refreshToken = await SecureStore.getItemAsync("refreshToken");
 
     try {
-      const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/authTokens/refresh`, {
+      const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/authTokens/refresh`, {
         method: "POST",
         headers: {"Content-Type" : "application/json"},
         body: JSON.stringify({refreshToken})
@@ -62,7 +62,7 @@ export default function Index() {
 
   const grabUser = async (userId: string) => {
     try {
-      const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/users/user/${userId}`, {
+      const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/users/user/${userId}`, {
         method: "GET",
         headers: {"Content-Type" : "application/json"}
       });

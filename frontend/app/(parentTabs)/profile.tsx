@@ -48,7 +48,7 @@ export default function profile() {
         setScanned(true);
 
         // Verify token exists
-        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/linkTokens/verify-link-token`, {
+        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/linkTokens/verify-link-token`, {
             method: "POST",
             headers: {"Content-Type":"application/json"},
             body: JSON.stringify({tokenId})
@@ -66,7 +66,7 @@ export default function profile() {
     const handlePairConfirmation = async () => {
         if (!childId) console.log("Failed scanning qr code");
         // Pair child with parent
-        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/parentChildren/pair-child`, {
+        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/parentChildren/pair-child`, {
             method: "POST",
             headers: {"Content-Type" : "application/json"},
             body: JSON.stringify({parentId, childId})

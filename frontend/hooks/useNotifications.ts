@@ -36,7 +36,7 @@ export const useNotifications = (userId:string | null) => {
                 const deviceId = await getDeviceId();
                 const platform = Platform.OS;
                 
-                const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/pushTokens/store-push`, {
+                const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/pushTokens/store-push`, {
                     method: "POST",
                     headers: {"Content-Type" : "application/json"},
                     body: JSON.stringify({deviceId, token, userId, platform})

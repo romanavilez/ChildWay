@@ -66,7 +66,7 @@ export default function children() {
             // Initialize children
             const getAllChildren = async () => {
                 try {
-                    const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/parentChildren/get-all-children/${parentId}`, {
+                    const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/parentChildren/get-all-children/${parentId}`, {
                         method: "GET",
                         headers: {"Content-Type" : "application/json"}
                     });
@@ -118,7 +118,7 @@ export default function children() {
         // Initialize alerts
         const getAllAlerts = async () => {
             try {
-                const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/alerts/all-alerts/${parentId}`, {
+                const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/alerts/all-alerts/${parentId}`, {
                     method: "GET",
                     headers: {"Content-Type" : "application/json"}
                 });

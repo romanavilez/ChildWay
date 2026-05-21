@@ -45,7 +45,7 @@ const Login = () => {
 
         try {
             // POST login
-            const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/users/login`, {
+            const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/users/login`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({username, password})

@@ -71,7 +71,7 @@ export const useMessages = () => {
 
     // Update last message and time
     const updateLastMessage = async (message: string, conversationId: number) => {
-        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/conversations/update-last-message`, {
+        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/conversations/update-last-message`, {
             method: "POST",
             headers: {"Content-Type" : "application/json"},
             body: JSON.stringify({message, conversationId})
@@ -109,7 +109,7 @@ export const useMessages = () => {
 
     // Set unread messages to zero
     const zeroUnreadMessages = async (conversationId: number, userId: string) => {
-        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/conversations/zero-unread-messages`, {
+        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/conversations/zero-unread-messages`, {
             method: "POST",
             headers: {"Content-Type" : "application/json"},
             body: JSON.stringify({conversationId, userId})
@@ -138,7 +138,7 @@ export const useMessages = () => {
 
     // Increase unread messages by one
     const increaseUnreadMessages = async (conversationId: number, userId: string) => {
-        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/conversations/increase-unread-messages`, {
+        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/conversations/increase-unread-messages`, {
             method: "POST",
             headers: {"Content-Type" : "application/json"},
             body: JSON.stringify({conversationId, userId})
@@ -164,7 +164,7 @@ export const useMessages = () => {
         const recipient = conversationPartner;
 
         try {
-            const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/pushTokens/send-message`, {
+            const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/pushTokens/send-message`, {
                 method: "POST",
                 headers: {"Content-Type" : "application/json"},
                 body: JSON.stringify({recipient, conversationId, title, body, data})
@@ -185,7 +185,7 @@ export const useMessages = () => {
         let createdAt: string = "";
         // store message in database
         try {
-            const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/messages/create-message`, {
+            const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/messages/create-message`, {
                 method: "POST",
                 headers: {"Content-Type" : "application/json"},
                 body: JSON.stringify({conversationId, sender, text})
@@ -221,7 +221,7 @@ export const useMessages = () => {
 
     // Get all messages for a specific convervsation
     const getAllMessages = async (conversation_id: number) => {
-        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/messages/get-all-messages/${conversation_id}`, {
+        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/messages/get-all-messages/${conversation_id}`, {
             method: "GET",
             headers: {"Content-Type" : "application/json"}
         })
@@ -235,7 +235,7 @@ export const useMessages = () => {
 
     // Get all conversations for this specific user
     const getAllConversations = async () => {
-        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/conversations/get-all-conversations/${userId}`, {
+        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/conversations/get-all-conversations/${userId}`, {
             method: "GET",
             headers: {"Content-Type" : "application/json"}
         })
@@ -259,7 +259,7 @@ export const useMessages = () => {
 
     // Add a conversation participant to database
     const addParticipant = async (conversationId: number, userId: string | null) => {
-        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/conversations/add-participant`, {
+        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/conversations/add-participant`, {
             method: "POST",
             headers: {"Content-Type" : "application/json"},
             body: JSON.stringify({conversationId, userId})
@@ -277,7 +277,7 @@ export const useMessages = () => {
     // handles a new conversation being opened
     const handleNewChat = async (conversationPartner: string, profilePic: string | null) => {
         // Attempt to create conversation
-        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/conversations/create-conversation`, {
+        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/conversations/create-conversation`, {
             method: "POST",
             headers: {"Content-Type" : "application/json"},
             body: JSON.stringify({type: 'direct', cp1: userId, cp2: conversationPartner})

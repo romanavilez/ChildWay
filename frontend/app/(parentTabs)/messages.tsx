@@ -46,7 +46,7 @@ export default function messages() {
     const userId = useAuthStore((state) => state.username);
 
     const getAllContacts = async () => {
-        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/parentChildren/get-all-children/${userId}`, {
+        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/parentChildren/get-all-children/${userId}`, {
             method: "GET",
             headers: {"Content-Type" : "application/json"}
         });

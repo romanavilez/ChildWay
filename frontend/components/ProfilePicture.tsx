@@ -43,7 +43,7 @@ const ProfilePicture = ({color} : {color: string}) => {
         } as any);
         formData.append('userId', userId as any);
 
-        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/users/update-profile-pic`, {
+        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/users/update-profile-pic`, {
             method: "POST", 
             headers: {"Content-Type" : "multipart/form-data"},
             body: formData
@@ -59,7 +59,7 @@ const ProfilePicture = ({color} : {color: string}) => {
     }
 
     const getProfilePic = async () => {
-        const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/users/profile-pic/${userId}`, {
+        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/users/profile-pic/${userId}`, {
             method: "GET",
             headers: {"Content-Type" : "application/json"}
         });

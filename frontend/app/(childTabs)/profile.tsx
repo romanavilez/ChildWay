@@ -34,7 +34,7 @@ const profile = () => {
     // Create token
     const createToken = async () => {
         try {
-            const res = await fetch(`http://${process.env.EXPO_PUBLIC_IP_ADDRESS}:5001/api/linkTokens/generate-link-token`,{
+            const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/linkTokens/generate-link-token`,{
                 method: 'POST',
                 headers: {"Content-Type" : "application/json"},
                 body: JSON.stringify({childId})

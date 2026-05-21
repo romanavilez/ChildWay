@@ -50,7 +50,10 @@ initSockets(io);
 // Connect to MySQL database
 await ConnectDB();
 
+// Grab port
+const PORT = process.env.PORT || 5001
+
 // Start server
-httpServer.listen(5001, "0.0.0.0", () => {
-    console.log("Server is running on port 5001");
+httpServer.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server is running on port ${PORT}`);
 })

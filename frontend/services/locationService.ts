@@ -34,7 +34,13 @@ TaskManager.defineTask(LOCATION_TASK, async ({data, error}) => {
             })
 
             const data = await res.json();
-
+            if (res.ok) {
+                if (data.anomaly !== null) {
+                    console.log("Anomaly:", data.anomaly, "- Score:", data.score);
+                } else {
+                    console.log("Could not detect anomaly:", data.error);
+                }
+            }
             if (!res.ok) console.log("location not sent:", data.error);
         } catch (error) {
             console.log(error);

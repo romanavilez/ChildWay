@@ -50,6 +50,9 @@ initSockets(io);
 // Connect to MySQL database
 await ConnectDB();
 
+// Import cron job
+import "./src/cron/retrainModels.js"
+
 // Grab port
 const PORT = process.env.PORT || 5001
 

@@ -70,8 +70,8 @@ export const createTables = async () => {
         CREATE TABLE IF NOT EXISTS location (
             location_id BIGINT AUTO_INCREMENT PRIMARY KEY,
             child_id VARCHAR(255) NOT NULL,
-            longitude DECIMAL(9,6) NOT NULL,
-            latitude DECIMAL(9,6) NOT NULL,
+            longitude DOUBLE NOT NULL,
+            latitude DOUBLE NOT NULL,
             speed DOUBLE NOT NULL,
             time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (child_id) REFERENCES user(username)
@@ -141,6 +141,7 @@ export const createTables = async () => {
         console.log("conversation_participants table created!");
     });
 
+    // message table creation
     const message = `
         CREATE TABLE IF NOT EXISTS message (
             message_id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -155,5 +156,22 @@ export const createTables = async () => {
     db.query(message, (err) => {
         if (err) throw err;
         console.log('Message table created!');
+    });
+
+    // model_registry table creation
+    const model_registry = `
+        CREATE TABLE IF NOT EXISTS model_registry (
+            mr_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+            child_id VARCHAR(255) NOT NULL UNIQUE,
+            model_ready BOOLEAN DEFAULT FALSE,
+            scaler_ready BOOLEAN DEFAULT FALSE,
+            last_trained DATETIME,
+            FOREIGN KEY (child_id) REFERENCES user (username)
+        );
+    `
+
+    db.query(model_registry, (err) => {
+        if (err) throw err;
+        console.log("Model_registry table created!");
     });
 };

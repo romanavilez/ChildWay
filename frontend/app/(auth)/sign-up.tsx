@@ -113,7 +113,7 @@ const SignUp = () => {
                             )}                    
                         </View>
                     </View>
-                    {/* Sign up fields */}-
+                    {/* Sign up fields */}
                     <InputField placeholder='Username' icon={usernameIcon} value={username} onChangeText={setUsername} tint='#FF6F52'/>
                     <InputField placeholder='Name' icon={nameIcon} value={name} onChangeText={setName} tint='#FF6F52'/>
                     <InputField placeholder='Email' icon={emailIcon} value={email} onChangeText={setEmail} tint='#FF6F52'/>

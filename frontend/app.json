@@ -7,6 +7,7 @@
     "scheme": "ChildWay",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "icon": "./assets/logo/ChildWayLogo2.png",
     "ios": {
       "supportsTablet": true
     },
@@ -36,6 +37,15 @@
           "locationAlwaysAndWhenInUsePermission": "Allow app to use your location.",
           "isAndroidBackgroundLocationEnabled": true,
           "isAndroidForegroundLocationEnabled": true
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/logo/ChildWayLogo2.png",
+          "imageWidth": 200,
+          "resizeMode": "cover",
+          "backgroundColor": "#12151D"
         }
       ],
       "expo-router",

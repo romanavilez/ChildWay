@@ -203,10 +203,10 @@ const Index = () => {
         }
     }
 
-    const handleNavigation = () => {
-        openGoogleMaps();
-        storeAlert();
-        sendNavigationNotification();
+    const handleNavigation = async () => {
+        await storeAlert();
+        await sendNavigationNotification();
+        await openGoogleMaps();
     }
 
     return (

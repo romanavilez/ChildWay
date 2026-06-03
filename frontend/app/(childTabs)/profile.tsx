@@ -49,7 +49,7 @@ const profile = () => {
                 console.log(data.error);
             }
         } catch (error) {
-            console.log("Error fetching token");
+            console.log("Error fetching token:", error);
         }
     }
 

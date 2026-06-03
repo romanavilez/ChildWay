@@ -4,6 +4,49 @@ import { useAuthStore } from '@/store/auth.store';
 
 export const LOCATION_TASK = "location-task";
 
+const storeAlert = async (childId: string) => {
+        const alertType = "anomaly";
+        const alertBody = "⁉️ Unusual Activity Detected";
+        // store alert
+        try {
+            const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/alerts/add-alert`, {
+                method: "POST",
+                headers: {"Content-Type" : "application/json"},
+                body: JSON.stringify({childId, alertType, alertBody})
+            });
+    
+            const data = await res.json();
+    
+            if (!res.ok) {
+                console.log("Failed to store alert:", data.error);
+            } 
+        } catch (error) {
+            console.log("Failed to store alert:", error);
+        }
+    }
+
+const sendAnomalyNotification = async (anomaly: string, childId: string) => {
+    try {
+        const title = `⁉️ ${childId}: Unusual Activity Detected`;
+        const body = anomaly;
+        const data = {sender: childId, type: "anomaly"}
+        // store alert before sending notification
+        storeAlert(childId);
+        // send notification
+        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/pushTokens/send-notification`, {
+            method: "POST",
+            headers: {"Content-Type" : "application/json"},
+            body: JSON.stringify({title, body, data})
+        })
+    
+        const data_ = await res.json();
+    
+        if (!res.ok) console.log("Error sending alert notification:", data_.error);
+    } catch (error) {
+        console.log("Couldn't send notification:", error);
+    }
+}
+
 TaskManager.defineTask(LOCATION_TASK, async ({data, error}) => {
     if (error) {
         console.log("Task manager error:", error);
@@ -36,12 +79,19 @@ TaskManager.defineTask(LOCATION_TASK, async ({data, error}) => {
             const data = await res.json();
             if (res.ok) {
                 if (data.anomaly !== null) {
-                    console.log("Anomaly:", data.anomaly, "- Score:", data.score);
-                } else {
+                    if (data.anomaly) {
+                        sendAnomalyNotification(data.explanation, childId);
+                    } 
+                    else {
+                        console.log("No anomaly");
+                    }
+                } 
+                else {
                     console.log("Could not detect anomaly:", data.error);
                 }
+            } else {
+                console.log("location not sent:", data.error);
             }
-            if (!res.ok) console.log("location not sent:", data.error);
         } catch (error) {
             console.log(error);
         }

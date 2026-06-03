@@ -232,16 +232,11 @@ const MessagesScreen = ({
                                         data={reversedMessages}
                                         renderItem={({item, index}) => {
                                             const nextMessage = reversedMessages[index + 1];
-                                            if (nextMessage) {
-                                                console.log("next:",new Date(nextMessage.created_at).toDateString());
-                                                console.log("message date:",new Date(item.created_at).toDateString());
-                                            }
                                             const showDate = 
                                                 !nextMessage || 
                                                 new Date(nextMessage.created_at).toDateString() !==
                                                 new Date(item.created_at).toDateString();
 
-                                            console.log("showDate:", showDate);
                                             return (
                                                 <View>
                                                     {showDate && (

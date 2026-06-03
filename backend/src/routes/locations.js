@@ -40,12 +40,12 @@ router.post("/send-location", (req, res) => {
     // Send child location to parents
     io.to(`child:${childId}`).emit("location_update", {childId, lng, lat, speed});
     
-    db.query(
-        // Insert location into location table
-        "INSERT INTO location(child_id, longitude, latitude, speed) VALUES(?,?,?,?)",
-        [childId, lng, lat, speed],
-        async (err, result) => {
-            if (err) return res.status(500).json({error: err});
+    // db.query(
+    //     // Insert location into location table
+    //     "INSERT INTO location(child_id, longitude, latitude, speed) VALUES(?,?,?,?)",
+    //     [childId, lng, lat, speed],
+    //     async (err, result) => {
+    //         if (err) return res.status(500).json({error: err});
             // Detect anomaly
         (async () => {
             try {
@@ -67,20 +67,21 @@ router.post("/send-location", (req, res) => {
                     const data = await mlResponse.json();
 
                     if (mlResponse.ok) {
-                        return res.status(200).json({success: true, anomaly: data.anomaly, score: data.score});
+                        return res.status(200).json({success: true, anomaly: data.anomaly, explanation: data.explanation, score: data.score});
                     } else {
-                        if (data.detail) return res.status(200).json({success: true, anomaly: null, error: data.detail})
+                        if (data.detail) return res.status(200).json({success: true, anomaly: null, explanation: null, error: data.detail})
                     }
                 } else {
-                    return res.status(200).json({success: true, anomaly: null, error: "Model is not ready"})
+                    return res.status(200).json({success: true, anomaly: null, explanation: null, error: "Model is not ready"})
                 }
             } catch (error) {
                 console.log("ML service error:", error);
-                return res.status(200).json({success: true, anomaly: null, error});
+                return res.status(200).json({success: true, anomaly: null, explanation: null, error});
             }
         })();
-        }
-    );
+        // }
+    // );
+    // return res.status(200).json({success: true})
 })
 
 export default router;

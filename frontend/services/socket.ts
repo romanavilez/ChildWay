@@ -41,7 +41,7 @@ const leaveAllChildren = async (userId:string) => {
     try {
         const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/parentChildren/get-all-children/${userId}`, {
             method: "GET",
-            headers: {"Content-Type" : "applicaton/json"}
+            headers: {"Content-Type" : "application/json"}
         })
         
         const data = await res.json();
@@ -60,10 +60,9 @@ const leaveAllChildren = async (userId:string) => {
 }
 
 export const connectSocket = (userId:string, userType:string) => {
-    // If socket exists, disconnect
+    // If socket exists, return it
     if (socket) {
-        socket.disconnect();
-        socket = null;
+        return socket;
     }
     // Connect to socket on server
     socket = io(`${process.env.EXPO_PUBLIC_API_URL}`, {

@@ -6,8 +6,13 @@ import { Camera, CameraView, BarcodeScanningResult} from 'expo-camera'
 import ProfilePicture from '@/components/ProfilePicture'
 import ProfileField from '@/components/ProfileField'
 import * as SecureStore from 'expo-secure-store'
+import { getSocket } from '@/services/socket'
+
 
 export default function profile() {
+    // Socket
+    const socket = getSocket();
+
     // Auth store
     const logout = useAuthStore((state) => state.logout);
     const parentId = useAuthStore((state) => state.username);
@@ -74,6 +79,7 @@ export default function profile() {
         // confirm pairing was successful
         const data = await res.json();
         if (data.success) {
+            socket?.emit("join_child", childId);
             console.log("Paired successfully");
         } else if (res.status === 409) {
             Alert.alert("Child already added", data.error)
